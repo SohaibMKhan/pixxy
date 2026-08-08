@@ -1,0 +1,66 @@
+:root {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #ffffff;
+  background: transparent;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background: transparent;
+}
+
+.pixxy-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.pixxy-card {
+  width: min(320px, 100%);
+  padding: 28px;
+  border-radius: 24px;
+  background: rgba(20, 20, 28, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  -webkit-app-region: drag;
+}
+
+.pixxy-avatar {
+  font-size: 64px;
+  line-height: 1;
+  margin-bottom: 16px;
+}
+
+h1,
+p {
+  margin: 0;
+}
+
+p {
+  margin-top: 8px;
+  opacity: 0.72;
+}
+
+.status {
+  display: inline-block;
+  margin-top: 18px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.08);
+}
