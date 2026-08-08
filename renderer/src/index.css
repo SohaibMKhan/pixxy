@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 0.4 seconds
-Output:
 :root { font-family: "Segoe UI", system-ui, sans-serif; color: #15313b; background: transparent; font-synthesis: none; }
 * { box-sizing: border-box; }
 html, body, #root { width: 100%; min-height: 100%; margin: 0; }
@@ -17,4 +14,3 @@ button { cursor: pointer; }
 .panel { width: min(340px, 100%); padding: 18px; border: 1px solid rgba(32, 71, 74, .2); border-radius: 8px; background: rgba(255, 253, 246, .97); box-shadow: 0 10px 28px rgba(25, 63, 63, .2); -webkit-app-region: no-drag; }
 .eyebrow { margin: 0 0 5px; color: #397866; font-size: 13px; font-weight: 700; }.panel h1 { margin: 0; font-size: 21px; }.panel label { display: grid; gap: 6px; margin-top: 14px; font-size: 13px; font-weight: 700; }.panel input:not([type="checkbox"]), .panel select { width: 100%; min-height: 38px; padding: 8px 10px; border: 1px solid #afc3bb; border-radius: 5px; background: #fff; color: #15313b; }
 .supporting-copy { margin: 12px 0; color: #577067; font-size: 12px; line-height: 1.45; }.primary-action { width: 100%; min-height: 40px; border: 0; border-radius: 5px; background: #397866; color: #fff; font-weight: 700; }.greeting { margin: 0 0 8px; font-weight: 700; }.text-action { border: 0; background: transparent; color: #397866; text-decoration: underline; font-size: 13px; }.panel-header { display: flex; align-items: center; justify-content: space-between; }.close-button { width: 28px; height: 28px; border: 0; border-radius: 4px; background: #e8f1eb; color: #1e544b; font-weight: 700; }.toggle-row { grid-template-columns: 1fr auto; align-items: center; }.toggle-row input { appearance: none; width: 38px; height: 22px; margin: 0; border-radius: 99px; background: #a9b9b4; transition: .15s background; }.toggle-row input::after { content: ''; display: block; width: 16px; height: 16px; margin: 3px; border-radius: 50%; background: #fff; transition: .15s transform; }.toggle-row input:checked { background: #397866; }.toggle-row input:checked::after { transform: translateX(16px); }.theme-label { margin-top: 18px; }.theme-moonlight .pet { background: #9a9bca; box-shadow: inset -12px -10px 0 #7274a7, 0 10px 0 rgba(15, 54, 58, .13); }.theme-sunset .pet { background: #e2765e; box-shadow: inset -12px -10px 0 #ba4f48, 0 10px 0 rgba(15, 54, 58, .13); }@keyframes bob { 50% { transform: translateY(-5px); } }
-

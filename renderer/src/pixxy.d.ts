@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 0.4 seconds
-Output:
 export {}
 
 declare global {
@@ -23,4 +20,3 @@ declare global {
     }
   }
 }
-

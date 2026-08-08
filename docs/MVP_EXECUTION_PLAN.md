@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 0.4 seconds
-Output:
 # Pixxy MVP Execution Plan
 
 ## Product Boundary
@@ -158,4 +155,3 @@ Exit criteria:
 ## Explicit Non-Goals
 
 Evolution, multiple species, cloud sync, mobile applications, multiplayer, voice, large agent workflows, broad desktop surveillance, and automatic AI-runtime/model redistribution are deferred beyond the MVP.
-

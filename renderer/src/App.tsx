@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 0.3 seconds
-Output:
 import { useEffect, useState } from 'react'
 
 const initialSettings: PixxySettings = {
@@ -19,19 +16,12 @@ export default function App() {
   const [name, setName] = useState('')
 
   useEffect(() => {
-    if (!window.pixxy?.settings) {
+    void window.pixxy.settings.read().then((saved) => {
+      setSettings(saved)
+      setName(saved.displayName)
+      setPanel(saved.completedOnboarding ? 'menu' : 'onboarding')
       setReady(true)
-      return
-    }
-
-    void window.pixxy.settings.read()
-      .then((saved) => {
-        setSettings(saved)
-        setName(saved.displayName)
-        setPanel(saved.completedOnboarding ? 'menu' : 'onboarding')
-      })
-      .catch(() => setPanel('onboarding'))
-      .finally(() => setReady(true))
+    })
   }, [])
 
   async function update(update: Partial<PixxySettings>) {
@@ -94,4 +84,3 @@ export default function App() {
     </main>
   )
 }
-
