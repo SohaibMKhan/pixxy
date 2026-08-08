@@ -1,66 +1,20 @@
-:root {
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #ffffff;
-  background: transparent;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-}
+Exit code: 0
+Wall time: 0.4 seconds
+Output:
+:root { font-family: "Segoe UI", system-ui, sans-serif; color: #15313b; background: transparent; font-synthesis: none; }
+* { box-sizing: border-box; }
+html, body, #root { width: 100%; min-height: 100%; margin: 0; }
+body { background: transparent; overflow: hidden; }
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+.pixxy-shell { min-height: 100vh; padding: 20px; display: grid; justify-items: center; align-content: start; gap: 8px; -webkit-app-region: drag; }
+.pet { position: relative; width: 148px; height: 134px; margin-top: 8px; border: 0; border-radius: 49% 49% 45% 45%; background: #e2a247; box-shadow: inset -12px -10px 0 #c67e31, 0 10px 0 rgba(15, 54, 58, .13); -webkit-app-region: no-drag; animation: bob 2.8s ease-in-out infinite; }
+.pet:focus-visible, .panel button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #e45858; outline-offset: 3px; }
+.pet-ear { position: absolute; top: -18px; width: 45px; height: 58px; border-radius: 45px 45px 10px 10px; background: #d78e3e; z-index: -1; }
+.pet-ear-left { left: 13px; transform: rotate(-20deg); }.pet-ear-right { right: 13px; transform: rotate(20deg); }
+.pet-face { position: absolute; left: 26px; top: 36px; width: 96px; height: 68px; border-radius: 45% 45% 50% 50%; background: #fff0cb; display: flex; justify-content: center; gap: 20px; padding-top: 20px; }
+.pet-face i { width: 9px; height: 12px; border-radius: 50%; background: #17323b; }.pet-face b { position: absolute; width: 20px; height: 12px; bottom: 13px; border-bottom: 3px solid #a95243; border-radius: 0 0 18px 18px; }
+.panel { width: min(340px, 100%); padding: 18px; border: 1px solid rgba(32, 71, 74, .2); border-radius: 8px; background: rgba(255, 253, 246, .97); box-shadow: 0 10px 28px rgba(25, 63, 63, .2); -webkit-app-region: no-drag; }
+.eyebrow { margin: 0 0 5px; color: #397866; font-size: 13px; font-weight: 700; }.panel h1 { margin: 0; font-size: 21px; }.panel label { display: grid; gap: 6px; margin-top: 14px; font-size: 13px; font-weight: 700; }.panel input:not([type="checkbox"]), .panel select { width: 100%; min-height: 38px; padding: 8px 10px; border: 1px solid #afc3bb; border-radius: 5px; background: #fff; color: #15313b; }
+.supporting-copy { margin: 12px 0; color: #577067; font-size: 12px; line-height: 1.45; }.primary-action { width: 100%; min-height: 40px; border: 0; border-radius: 5px; background: #397866; color: #fff; font-weight: 700; }.greeting { margin: 0 0 8px; font-weight: 700; }.text-action { border: 0; background: transparent; color: #397866; text-decoration: underline; font-size: 13px; }.panel-header { display: flex; align-items: center; justify-content: space-between; }.close-button { width: 28px; height: 28px; border: 0; border-radius: 4px; background: #e8f1eb; color: #1e544b; font-weight: 700; }.toggle-row { grid-template-columns: 1fr auto; align-items: center; }.toggle-row input { appearance: none; width: 38px; height: 22px; margin: 0; border-radius: 99px; background: #a9b9b4; transition: .15s background; }.toggle-row input::after { content: ''; display: block; width: 16px; height: 16px; margin: 3px; border-radius: 50%; background: #fff; transition: .15s transform; }.toggle-row input:checked { background: #397866; }.toggle-row input:checked::after { transform: translateX(16px); }.theme-label { margin-top: 18px; }.theme-moonlight .pet { background: #9a9bca; box-shadow: inset -12px -10px 0 #7274a7, 0 10px 0 rgba(15, 54, 58, .13); }.theme-sunset .pet { background: #e2765e; box-shadow: inset -12px -10px 0 #ba4f48, 0 10px 0 rgba(15, 54, 58, .13); }@keyframes bob { 50% { transform: translateY(-5px); } }
 
-* {
-  box-sizing: border-box;
-}
-
-html,
-body,
-#root {
-  width: 100%;
-  min-height: 100%;
-  margin: 0;
-}
-
-body {
-  background: transparent;
-}
-
-.pixxy-shell {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-}
-
-.pixxy-card {
-  width: min(320px, 100%);
-  padding: 28px;
-  border-radius: 24px;
-  background: rgba(20, 20, 28, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  text-align: center;
-  -webkit-app-region: drag;
-}
-
-.pixxy-avatar {
-  font-size: 64px;
-  line-height: 1;
-  margin-bottom: 16px;
-}
-
-h1,
-p {
-  margin: 0;
-}
-
-p {
-  margin-top: 8px;
-  opacity: 0.72;
-}
-
-.status {
-  display: inline-block;
-  margin-top: 18px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  background: rgba(255, 255, 255, 0.08);
-}

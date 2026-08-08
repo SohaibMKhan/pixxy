@@ -1,5 +1,9 @@
+Exit code: 0
+Wall time: 0.4 seconds
+Output:
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import react from '@vitejs/plugin-react'
+import { resolve } from 'node:path'
 
 export default defineConfig({
   main: {
@@ -21,5 +25,11 @@ export default defineConfig({
   renderer: {
     root: 'renderer',
     plugins: [react()],
+    build: {
+      rollupOptions: {
+        input: resolve(__dirname, 'renderer/index.html'),
+      },
+    },
   },
 })
+
