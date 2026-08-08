@@ -1,8 +1,11 @@
+Exit code: 0
+Wall time: 0.4 seconds
+Output:
 {
   "name": "pixxy",
   "version": "0.1.0",
-  "description": "Pixxy — a local-first desktop virtual pet and digital companion.",
-  "main": "dist/main/index.js",
+  "description": "Pixxy â€” a local-first desktop virtual pet and digital companion.",
+  "main": "out/main/index.js",
   "author": "Sohaib Muhammad Khan",
   "license": "MIT",
   "private": true,
@@ -31,3 +34,4 @@
     "vitest": "^3.2.4"
   }
 }
+
