@@ -1,0 +1,26 @@
+appId: com.sohaibmkhan.pixxy
+productName: Pixxy
+artifactName: Pixxy-${version}-${arch}.${ext}
+
+directories:
+  output: release
+  buildResources: assets
+
+files:
+  - dist/**
+  - package.json
+
+win:
+  target:
+    - nsis
+  artifactName: Pixxy-${version}-Windows-${arch}.${ext}
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Pixxy
+
+publish: null
