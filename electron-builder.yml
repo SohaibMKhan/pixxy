@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 0.6 seconds
+Output:
 appId: com.sohaibmkhan.pixxy
 productName: Pixxy
 artifactName: Pixxy-${version}-${arch}.${ext}
@@ -7,7 +10,7 @@ directories:
   buildResources: assets
 
 files:
-  - dist/**
+  - out/**
   - package.json
 
 win:
@@ -24,3 +27,4 @@ nsis:
   shortcutName: Pixxy
 
 publish: null
+
