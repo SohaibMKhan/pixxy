@@ -1,5 +1,5 @@
 Exit code: 0
-Wall time: 0.4 seconds
+Wall time: 0.9 seconds
 Output:
 import { app, BrowserWindow, ipcMain, Menu, nativeImage, Tray } from 'electron'
 import fs from 'node:fs'
@@ -76,7 +76,7 @@ function createWindow() {
     alwaysOnTop: readSettings().alwaysOnTop,
     skipTaskbar: true,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, '../preload/preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
     },
