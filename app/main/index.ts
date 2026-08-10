@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 0.9 seconds
-Output:
 import { app, BrowserWindow, ipcMain, Menu, nativeImage, Tray } from 'electron'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -121,4 +118,3 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
 })
-

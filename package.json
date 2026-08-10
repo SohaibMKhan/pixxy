@@ -1,7 +1,7 @@
 {
   "name": "pixxy",
   "version": "0.1.0",
-  "description": "Pixxy â€” a local-first desktop virtual pet and digital companion.",
+  "description": "Pixxy — a local-first desktop virtual pet and digital companion.",
   "main": "out/main/index.js",
   "author": "Sohaib Muhammad Khan",
   "license": "MIT",
@@ -31,4 +31,3 @@
     "vitest": "^3.2.4"
   }
 }
-

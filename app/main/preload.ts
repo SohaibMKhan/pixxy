@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 0.6 seconds
-Output:
 import { contextBridge, ipcRenderer } from 'electron'
 
 contextBridge.exposeInMainWorld('pixxy', {
@@ -10,4 +7,3 @@ contextBridge.exposeInMainWorld('pixxy', {
     update: (settings: Record<string, unknown>) => ipcRenderer.invoke('settings:update', settings),
   },
 })
-
