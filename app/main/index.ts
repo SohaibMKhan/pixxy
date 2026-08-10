@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Menu, nativeImage, Tray } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu, nativeImage, screen, Tray } from 'electron'
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -62,16 +62,25 @@ function createTray() {
 }
 
 function createWindow() {
+  const workArea = screen.getPrimaryDisplay().workArea
+  const width = 380
+  const height = 440
+  const x = Math.max(workArea.x + workArea.width - width - 24, workArea.x)
+  const y = Math.max(workArea.y + workArea.height - height - 80, workArea.y)
+
   mainWindow = new BrowserWindow({
-    width: 380,
-    height: 440,
+    width,
+    height,
+    x,
+    y,
     minWidth: 340,
     minHeight: 400,
     transparent: true,
     frame: false,
     resizable: true,
     alwaysOnTop: readSettings().alwaysOnTop,
-    skipTaskbar: true,
+    skipTaskbar: false,
+    autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, '../preload/preload.js'),
       contextIsolation: true,

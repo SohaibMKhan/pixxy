@@ -50,9 +50,12 @@ export default function App() {
   return (
     <main className={`pixxy-shell theme-${settings.roomTheme}`} aria-label="Pixxy desktop companion">
       <button className="pet" type="button" aria-label="Open Pixxy interactions" onClick={() => setPanel('menu')}>
-        <span className="pet-ear pet-ear-left" />
-        <span className="pet-ear pet-ear-right" />
-        <span className="pet-face"><i /><i /><b /></span>
+        <span className="pet-body" />
+        <span className="pet-head">
+          <span className="pet-ear pet-ear-left" />
+          <span className="pet-ear pet-ear-right" />
+          <span className="pet-face"><i /><i /><b /></span>
+        </span>
       </button>
 
       {panel === 'onboarding' && (
