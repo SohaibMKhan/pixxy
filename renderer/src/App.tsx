@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import SpriteAnimation from './SpriteAnimation'
+import idleSheet from './assets/animations/idle/pixxy_idle.png'
+import waveSheet from './assets/animations/wave/pixxy_wave.png'
 
 const initialSettings: PixxySettings = {
   completedOnboarding: false,
@@ -8,11 +10,6 @@ const initialSettings: PixxySettings = {
   alwaysOnTop: false,
   desktopAwarenessEnabled: false,
   launchAtLogin: false,
-}
-
-const animationSources = {
-  idle: './assets/animations/idle/pixxy_idle.png',
-  wave: './assets/animations/wave/pixxy_wave.png',
 }
 
 export default function App() {
@@ -58,14 +55,10 @@ export default function App() {
     setAnimation('wave')
   }
 
-  function interactWithPixxy() {
-    setAnimation('wave')
-  }
-
   function handlePetClick() {
     if (clickTimer.current !== undefined) window.clearTimeout(clickTimer.current)
     clickTimer.current = window.setTimeout(() => {
-      interactWithPixxy()
+      setAnimation('wave')
       clickTimer.current = undefined
     }, 220)
   }
@@ -90,7 +83,7 @@ export default function App() {
         onDoubleClick={handlePetDoubleClick}
       >
         <SpriteAnimation
-          src={animationSources[animation]}
+          src={animation === 'wave' ? waveSheet : idleSheet}
           columns={animation === 'wave' ? 8 : 5}
           rows={animation === 'wave' ? 1 : 2}
           fps={animation === 'wave' ? 8 : 5}
