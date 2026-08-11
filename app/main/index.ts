@@ -37,7 +37,7 @@ function readSettings(): PixxySettings {
 }
 
 function writeSettings(settings: PixxySettings) {
-  fs.mkdirSync(app.getPath('userData'), { recursive: true })
+  fs.mkdirSync(path.dirname(settingsPath()), { recursive: true })
   fs.writeFileSync(settingsPath(), JSON.stringify(settings, null, 2), 'utf8')
 }
 
@@ -48,7 +48,7 @@ function applySettings(settings: PixxySettings) {
 
 function createTray() {
   const icon = nativeImage.createFromDataURL(
-    'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI4IiBmaWxsPSIjMjY1ZjczIi8+PGNpcmNsZSBjeD0iMTEiIGN5PSIxMyIgcj0iMyIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjIxIiBjeT0iMTMiIHI9IjMiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNOSAyMGM0IDMgMTAgMyAxNCAwIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+'
+    'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI4IiBmaWxsPSIjMjY1ZjczIi8+PGNpcmNsZSBjeD0iMTEiIGN5PSIxMyIgcj0iMyIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjIxIiBjeT0iMTMiIHI9IjMiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNOSAyMGM0IDMgMTAgMyAxNCAwIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0PSIzIiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48L3N2Zz4='
   )
   tray = new Tray(icon)
   tray.setToolTip('Pixxy')
@@ -63,21 +63,21 @@ function createTray() {
 
 function createWindow() {
   const workArea = screen.getPrimaryDisplay().workArea
-  const width = 380
-  const height = 440
-  const x = Math.max(workArea.x + workArea.width - width - 24, workArea.x)
-  const y = Math.max(workArea.y + workArea.height - height - 80, workArea.y)
+  const width = workArea.width
+  const height = 280
+  const x = workArea.x
+  const y = workArea.y + workArea.height - height
 
   mainWindow = new BrowserWindow({
     width,
     height,
     x,
     y,
-    minWidth: 340,
-    minHeight: 400,
+    minWidth: 640,
+    minHeight: 240,
     transparent: true,
     frame: false,
-    resizable: true,
+    resizable: false,
     alwaysOnTop: readSettings().alwaysOnTop,
     skipTaskbar: false,
     autoHideMenuBar: true,
