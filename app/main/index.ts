@@ -9,7 +9,7 @@ let isQuitting = false
 export type PixxySettings = {
   completedOnboarding: boolean
   displayName: string
-  roomTheme: 'meadow' | 'moonlight' | 'sunset'
+  roomTheme: 'meadow' | 'moonlight' | 'sunset' | 'ocean' | 'lavender' | 'peach'
   alwaysOnTop: boolean
   desktopAwarenessEnabled: boolean
   launchAtLogin: boolean
@@ -30,7 +30,13 @@ function settingsPath() {
 
 function readSettings(): PixxySettings {
   try {
-    return { ...defaultSettings, ...JSON.parse(fs.readFileSync(settingsPath(), 'utf8')) }
+    const saved = JSON.parse(fs.readFileSync(settingsPath(), 'utf8'))
+    const validThemes: PixxySettings['roomTheme'][] = ['meadow', 'moonlight', 'sunset', 'ocean', 'lavender', 'peach']
+    return {
+      ...defaultSettings,
+      ...saved,
+      roomTheme: validThemes.includes(saved.roomTheme) ? saved.roomTheme : defaultSettings.roomTheme,
+    }
   } catch {
     return defaultSettings
   }
@@ -63,8 +69,10 @@ function createTray() {
 
 function createWindow() {
   const workArea = screen.getPrimaryDisplay().workArea
+  // Keep the transparent Electron surface to a short strip above the taskbar.
+  // A full-height transparent window creates an invisible desktop-blocking wall.
   const width = workArea.width
-  const height = 280
+  const height = 220
   const x = workArea.x
   const y = workArea.y + workArea.height - height
 
@@ -74,7 +82,7 @@ function createWindow() {
     x,
     y,
     minWidth: 640,
-    minHeight: 240,
+    minHeight: 200,
     transparent: true,
     frame: false,
     resizable: false,
