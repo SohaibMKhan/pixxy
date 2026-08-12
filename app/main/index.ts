@@ -69,8 +69,8 @@ function createTray() {
 
 function createWindow() {
   const workArea = screen.getPrimaryDisplay().workArea
-  // Keep the transparent Electron surface to a short strip above the taskbar.
-  // A full-height transparent window creates an invisible desktop-blocking wall.
+  // Keep only a short bottom strip, then make it click-through except when
+  // the pointer is over Pixxy or an interactive panel is open.
   const width = workArea.width
   const height = 220
   const x = workArea.x
@@ -87,7 +87,7 @@ function createWindow() {
     frame: false,
     resizable: false,
     alwaysOnTop: readSettings().alwaysOnTop,
-    skipTaskbar: false,
+    skipTaskbar: true,
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, '../preload/preload.js'),
@@ -95,6 +95,9 @@ function createWindow() {
       nodeIntegration: false,
     },
   })
+
+  // Let the desktop receive clicks everywhere except the character/panel.
+  mainWindow.setIgnoreMouseEvents(true, { forward: true })
 
   if (process.env.ELECTRON_RENDERER_URL) {
     void mainWindow.loadURL(process.env.ELECTRON_RENDERER_URL)
@@ -117,6 +120,9 @@ app.whenReady().then(() => {
     writeSettings(settings)
     applySettings(settings)
     return settings
+  })
+  ipcMain.on('window:set-ignore-mouse', (_event, ignore: boolean) => {
+    mainWindow?.setIgnoreMouseEvents(ignore, { forward: true })
   })
 
   createWindow()
