@@ -4,7 +4,7 @@ declare global {
   type PixxySettings = {
     completedOnboarding: boolean
     displayName: string
-    roomTheme: 'meadow' | 'moonlight' | 'sunset'
+    roomTheme: 'meadow' | 'moonlight' | 'sunset' | 'ocean' | 'lavender' | 'peach'
     alwaysOnTop: boolean
     desktopAwarenessEnabled: boolean
     launchAtLogin: boolean
