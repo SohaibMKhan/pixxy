@@ -2,6 +2,7 @@ export {}
 
 declare global {
   type PixxySettings = {
+    profileVersion: number
     completedOnboarding: boolean
     displayName: string
     roomTheme: 'meadow' | 'moonlight' | 'sunset' | 'ocean' | 'lavender' | 'peach'
@@ -18,7 +19,8 @@ declare global {
         update: (settings: Partial<PixxySettings>) => Promise<PixxySettings>
       }
       window: {
-        setIgnoreMouseEvents: (ignore: boolean) => void
+        setSettingsOpen: (open: boolean) => void
+        moveBy: (delta: number) => Promise<{ x: number; hitBoundary: boolean }>
       }
     }
   }
