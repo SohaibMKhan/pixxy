@@ -1,13 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import SpriteAnimation from './SpriteAnimation'
 import idleSheet from './assets/animations/idle/pixxy_idle.png'
-import blinkSheet from './assets/animations/blink/pixxy_blink.png'
-import bounceSheet from './assets/animations/bounce/pixxy_bounce.png'
-import playfulSheet from './assets/animations/playful/pixxy_playful.png'
 import waveSheet from './assets/animations/wave/pixxy_wave.png'
 import walkSheet from './assets/animations/walk/pixxy_walk_8f.png'
 
 const initialSettings: PixxySettings = {
+  profileVersion: 2,
   completedOnboarding: false,
   displayName: '',
   roomTheme: 'meadow',
@@ -16,36 +14,15 @@ const initialSettings: PixxySettings = {
   launchAtLogin: false,
 }
 
-type AnimationName = 'idle' | 'blink' | 'bounce' | 'playful' | 'walk' | 'wave'
-type GestureName = Exclude<AnimationName, 'idle' | 'walk'>
+type AnimationName = 'idle' | 'walk' | 'wave'
 
 const animationSources: Record<AnimationName, string> = {
   idle: idleSheet,
-  blink: blinkSheet,
-  bounce: bounceSheet,
-  playful: playfulSheet,
   walk: walkSheet,
   wave: waveSheet,
 }
 
-const gestureDurations: Record<GestureName, number> = {
-  blink: 1100,
-  bounce: 1800,
-  playful: 2400,
-  wave: 2800,
-}
-
-const PET_WIDTH = 150
-const PET_MARGIN = 14
-
-function randomBetween(min: number, max: number) {
-  return Math.round(min + Math.random() * (max - min))
-}
-
-function randomGesture(): GestureName {
-  const gestures: GestureName[] = ['blink', 'bounce', 'playful', 'wave']
-  return gestures[Math.floor(Math.random() * gestures.length)]
-}
+const PET_STEP = 2.2
 
 export default function App() {
   const [settings, setSettings] = useState<PixxySettings>(initialSettings)
@@ -53,90 +30,50 @@ export default function App() {
   const [panel, setPanel] = useState<'settings' | 'onboarding' | null>(null)
   const [name, setName] = useState('')
   const [animation, setAnimation] = useState<AnimationName>('idle')
-  const [petX, setPetX] = useState(PET_MARGIN)
   const [direction, setDirection] = useState<1 | -1>(1)
+  const [dragEnabled, setDragEnabled] = useState(false)
   const clickTimer = useRef<number | undefined>(undefined)
-  const petRef = useRef<HTMLButtonElement>(null)
-  const panelRef = useRef(panel)
-  const mouseIgnoredRef = useRef(true)
+  const panelRef = useRef<typeof panel>(null)
+  const movePendingRef = useRef(false)
 
   useEffect(() => {
     panelRef.current = panel
   }, [panel])
-
-  const setMouseIgnored = (ignore: boolean) => {
-    if (mouseIgnoredRef.current === ignore) return
-    mouseIgnoredRef.current = ignore
-    window.pixxy?.window.setIgnoreMouseEvents(ignore)
-  }
-
-  useEffect(() => {
-    if (!window.pixxy?.window) return
-    if (panel !== null) setMouseIgnored(false)
-  }, [panel])
-
-  useEffect(() => {
-    if (!window.pixxy?.settings) {
-      setReady(true)
-      return
-    }
-
-    void window.pixxy.settings.read()
-      .then((saved) => {
-        setSettings(saved)
-        setName(saved.displayName)
-        if (!saved.completedOnboarding || !saved.displayName.trim()) setPanel('onboarding')
-      })
-      .catch(() => setPanel('onboarding'))
-      .finally(() => setReady(true))
-  }, [])
 
   useEffect(() => () => {
     if (clickTimer.current !== undefined) window.clearTimeout(clickTimer.current)
   }, [])
 
   useEffect(() => {
-    if (!ready) return
-
-    const handleMouseMove = (event: MouseEvent) => {
-      if (panelRef.current !== null) {
-        setMouseIgnored(false)
-        return
-      }
-
-      const rect = petRef.current?.getBoundingClientRect()
-      const overPet = rect
-        ? event.clientX >= rect.left
-          && event.clientX <= rect.right
-          && event.clientY >= rect.top
-          && event.clientY <= rect.bottom
-        : false
-
-      setMouseIgnored(!overPet)
-    }
-
-    window.addEventListener('mousemove', handleMouseMove)
-    return () => window.removeEventListener('mousemove', handleMouseMove)
-  }, [ready])
+    void window.pixxy.settings.read()
+      .then((saved) => {
+        setSettings(saved)
+        setName(saved.displayName)
+        if (!saved.completedOnboarding || !saved.displayName.trim()) {
+          setPanel('onboarding')
+          window.pixxy.window.setSettingsOpen(true)
+        }
+      })
+      .catch(() => {
+        setPanel('onboarding')
+        window.pixxy.window.setSettingsOpen(true)
+      })
+      .finally(() => setReady(true))
+  }, [])
 
   useEffect(() => {
     if (!ready || animation !== 'walk') return
 
     const timer = window.setInterval(() => {
-      setPetX((current) => {
-        const max = Math.max(PET_MARGIN, window.innerWidth - PET_WIDTH - PET_MARGIN)
-        const next = current + direction * 1.65
-
-        if (next <= PET_MARGIN) {
-          setDirection(1)
-          return PET_MARGIN
-        }
-        if (next >= max) {
-          setDirection(-1)
-          return max
-        }
-        return next
-      })
+      if (movePendingRef.current || panelRef.current !== null) return
+      movePendingRef.current = true
+      void window.pixxy.window.moveBy(direction * PET_STEP)
+        .then((result) => {
+          if (result.hitBoundary) setDirection((value) => (value === 1 ? -1 : 1))
+        })
+        .finally(() => {
+          movePendingRef.current = false
+        })
     }, 45)
 
     return () => window.clearInterval(timer)
@@ -146,49 +83,40 @@ export default function App() {
     if (!ready || !settings.completedOnboarding) return
 
     let cancelled = false
-    const wait = (milliseconds: number) => new Promise<void>((resolve) => {
-      window.setTimeout(resolve, milliseconds)
-    })
-    const waitForPanelToClose = async () => {
-      while (!cancelled && panelRef.current !== null) await wait(100)
+    const wait = (milliseconds: number) => new Promise<void>((resolve) => window.setTimeout(resolve, milliseconds))
+    const waitForSettingsToClose = async () => {
+      while (!cancelled && panelRef.current !== null) await wait(120)
     }
 
     const run = async () => {
-      await waitForPanelToClose()
+      await waitForSettingsToClose()
       if (cancelled) return
 
       setAnimation('wave')
-      await wait(2800)
+      await wait(3000)
       if (cancelled) return
 
       setAnimation('idle')
-      await wait(randomBetween(5000, 7500))
+      await wait(7500)
 
       while (!cancelled) {
-        await waitForPanelToClose()
+        await waitForSettingsToClose()
         if (cancelled) break
 
-        const shouldWalk = Math.random() < 0.52
-        if (shouldWalk) {
-          setDirection(Math.random() > 0.5 ? 1 : -1)
-          setAnimation('walk')
-          await wait(randomBetween(5000, 9000))
-          if (cancelled) break
-          setAnimation('idle')
-          await wait(randomBetween(2500, 5000))
-        } else {
-          const gesture = randomGesture()
-          setAnimation(gesture)
-          await wait(gestureDurations[gesture])
-          if (cancelled) break
-          setAnimation('idle')
-          await wait(randomBetween(4500, 8000))
-        }
+        setDirection(Math.random() > 0.5 ? 1 : -1)
+        setAnimation('walk')
+        await wait(6500 + Math.round(Math.random() * 2500))
+        if (cancelled) break
+
+        setAnimation('idle')
+        await wait(5500 + Math.round(Math.random() * 3000))
       }
     }
 
     void run()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [ready, settings.completedOnboarding])
 
   async function update(update: Partial<PixxySettings>) {
@@ -203,8 +131,9 @@ export default function App() {
     })
     setSettings(saved)
     setPanel(null)
+    setDragEnabled(false)
+    window.pixxy.window.setSettingsOpen(false)
     setAnimation('wave')
-    setMouseIgnored(true)
   }
 
   async function resetProfile() {
@@ -214,8 +143,9 @@ export default function App() {
     })
     setSettings(saved)
     setName('')
+    setDragEnabled(false)
     setPanel('onboarding')
-    setMouseIgnored(false)
+    window.pixxy.window.setSettingsOpen(true)
   }
 
   async function restoreDefaults() {
@@ -241,23 +171,31 @@ export default function App() {
       window.clearTimeout(clickTimer.current)
       clickTimer.current = undefined
     }
-    setMouseIgnored(false)
+    setDragEnabled(true)
     setPanel('settings')
+    window.pixxy.window.setSettingsOpen(true)
+  }
+
+  function closeSettings() {
+    setPanel(null)
+    setDragEnabled(false)
+    window.pixxy.window.setSettingsOpen(false)
+    setAnimation('idle')
   }
 
   if (!ready) return null
 
-  const isWalking = animation === 'walk'
-  const animationFrameGrid = animation === 'wave'
-    ? { columns: 8, rows: 1, fps: 4.5 }
-    : { columns: 6, rows: 2, fps: animation === 'idle' ? 1 : 5 }
+  const animationFrameGrid = animation === 'walk'
+    ? { columns: 8, rows: 1, fps: 7 }
+    : animation === 'wave'
+      ? { columns: 8, rows: 1, fps: 4 }
+      : { columns: 6, rows: 2, fps: 1 }
 
   return (
-    <main className={`pixxy-shell theme-${settings.roomTheme}`} aria-label="Pixxy desktop companion">
+    <main className={`pixxy-shell theme-${settings.roomTheme} ${dragEnabled ? 'drag-enabled' : ''}`} aria-label="Pixxy desktop companion">
       <button
-        ref={petRef}
-        className={`pet ${isWalking ? 'is-walking' : ''}`}
-        style={{ left: `${petX}px`, transform: `scaleX(${direction})` }}
+        className="pet"
+        style={{ transform: `scaleX(${direction})` }}
         type="button"
         aria-label="Pixxy"
         onClick={handlePetClick}
@@ -270,8 +208,8 @@ export default function App() {
           fps={animationFrameGrid.fps}
           loop={animation !== 'idle'}
           freezeFrame={animation === 'idle' ? 0 : undefined}
-          width={150}
-          height={190}
+          width={190}
+          height={205}
           onComplete={() => setAnimation('idle')}
         />
       </button>
@@ -293,10 +231,7 @@ export default function App() {
         <section className="panel settings-panel" aria-label="Pixxy settings">
           <div className="panel-header">
             <h1>Settings</h1>
-            <button className="close-button" type="button" aria-label="Close settings" onClick={() => {
-              setPanel(null)
-              setMouseIgnored(true)
-            }}>×</button>
+            <button className="close-button" type="button" aria-label="Close settings" onClick={closeSettings}>×</button>
           </div>
 
           <label className="toggle-row">
