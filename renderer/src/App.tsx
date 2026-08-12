@@ -17,7 +17,6 @@ const initialSettings: PixxySettings = {
 }
 
 type AnimationName = 'idle' | 'blink' | 'bounce' | 'playful' | 'walk' | 'wave'
-
 type GestureName = Exclude<AnimationName, 'idle' | 'walk'>
 
 const animationSources: Record<AnimationName, string> = {
@@ -33,8 +32,11 @@ const gestureDurations: Record<GestureName, number> = {
   blink: 1100,
   bounce: 1800,
   playful: 2400,
-  wave: 2400,
+  wave: 2800,
 }
+
+const PET_WIDTH = 150
+const PET_MARGIN = 14
 
 function randomBetween(min: number, max: number) {
   return Math.round(min + Math.random() * (max - min))
@@ -51,9 +53,27 @@ export default function App() {
   const [panel, setPanel] = useState<'settings' | 'onboarding' | null>(null)
   const [name, setName] = useState('')
   const [animation, setAnimation] = useState<AnimationName>('idle')
-  const [petX, setPetX] = useState(40)
+  const [petX, setPetX] = useState(PET_MARGIN)
   const [direction, setDirection] = useState<1 | -1>(1)
   const clickTimer = useRef<number | undefined>(undefined)
+  const petRef = useRef<HTMLButtonElement>(null)
+  const panelRef = useRef(panel)
+  const mouseIgnoredRef = useRef(true)
+
+  useEffect(() => {
+    panelRef.current = panel
+  }, [panel])
+
+  const setMouseIgnored = (ignore: boolean) => {
+    if (mouseIgnoredRef.current === ignore) return
+    mouseIgnoredRef.current = ignore
+    window.pixxy?.window.setIgnoreMouseEvents(ignore)
+  }
+
+  useEffect(() => {
+    if (!window.pixxy?.window) return
+    if (panel !== null) setMouseIgnored(false)
+  }, [panel])
 
   useEffect(() => {
     if (!window.pixxy?.settings) {
@@ -65,7 +85,7 @@ export default function App() {
       .then((saved) => {
         setSettings(saved)
         setName(saved.displayName)
-        if (!saved.completedOnboarding) setPanel('onboarding')
+        if (!saved.completedOnboarding || !saved.displayName.trim()) setPanel('onboarding')
       })
       .catch(() => setPanel('onboarding'))
       .finally(() => setReady(true))
@@ -76,18 +96,40 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    if (!ready || panel !== null || animation !== 'walk') return
+    if (!ready) return
+
+    const handleMouseMove = (event: MouseEvent) => {
+      if (panelRef.current !== null) {
+        setMouseIgnored(false)
+        return
+      }
+
+      const rect = petRef.current?.getBoundingClientRect()
+      const overPet = rect
+        ? event.clientX >= rect.left
+          && event.clientX <= rect.right
+          && event.clientY >= rect.top
+          && event.clientY <= rect.bottom
+        : false
+
+      setMouseIgnored(!overPet)
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    return () => window.removeEventListener('mousemove', handleMouseMove)
+  }, [ready])
+
+  useEffect(() => {
+    if (!ready || animation !== 'walk') return
 
     const timer = window.setInterval(() => {
       setPetX((current) => {
-        const width = 150
-        const margin = 8
-        const max = Math.max(margin, window.innerWidth - width - margin)
-        const next = current + direction * 1.7
+        const max = Math.max(PET_MARGIN, window.innerWidth - PET_WIDTH - PET_MARGIN)
+        const next = current + direction * 1.65
 
-        if (next <= margin) {
+        if (next <= PET_MARGIN) {
           setDirection(1)
-          return margin
+          return PET_MARGIN
         }
         if (next >= max) {
           setDirection(-1)
@@ -98,26 +140,34 @@ export default function App() {
     }, 45)
 
     return () => window.clearInterval(timer)
-  }, [animation, direction, panel, ready])
+  }, [animation, direction, ready])
 
   useEffect(() => {
-    if (!ready || panel !== null || !settings.completedOnboarding) return
+    if (!ready || !settings.completedOnboarding) return
 
     let cancelled = false
     const wait = (milliseconds: number) => new Promise<void>((resolve) => {
       window.setTimeout(resolve, milliseconds)
     })
+    const waitForPanelToClose = async () => {
+      while (!cancelled && panelRef.current !== null) await wait(100)
+    }
 
     const run = async () => {
-      // A slower first wave gives the user time to notice Pixxy's arrival.
+      await waitForPanelToClose()
+      if (cancelled) return
+
       setAnimation('wave')
-      await wait(2400)
+      await wait(2800)
       if (cancelled) return
 
       setAnimation('idle')
       await wait(randomBetween(5000, 7500))
 
       while (!cancelled) {
+        await waitForPanelToClose()
+        if (cancelled) break
+
         const shouldWalk = Math.random() < 0.52
         if (shouldWalk) {
           setDirection(Math.random() > 0.5 ? 1 : -1)
@@ -139,7 +189,7 @@ export default function App() {
 
     void run()
     return () => { cancelled = true }
-  }, [panel, ready, settings.completedOnboarding])
+  }, [ready, settings.completedOnboarding])
 
   async function update(update: Partial<PixxySettings>) {
     const saved = await window.pixxy.settings.update(update)
@@ -154,6 +204,7 @@ export default function App() {
     setSettings(saved)
     setPanel(null)
     setAnimation('wave')
+    setMouseIgnored(true)
   }
 
   async function resetProfile() {
@@ -164,6 +215,7 @@ export default function App() {
     setSettings(saved)
     setName('')
     setPanel('onboarding')
+    setMouseIgnored(false)
   }
 
   async function restoreDefaults() {
@@ -189,6 +241,7 @@ export default function App() {
       window.clearTimeout(clickTimer.current)
       clickTimer.current = undefined
     }
+    setMouseIgnored(false)
     setPanel('settings')
   }
 
@@ -196,12 +249,13 @@ export default function App() {
 
   const isWalking = animation === 'walk'
   const animationFrameGrid = animation === 'wave'
-    ? { columns: 8, rows: 1, fps: 5 }
-    : { columns: 4, rows: 2, fps: animation === 'idle' ? 3.5 : 5 }
+    ? { columns: 8, rows: 1, fps: 4.5 }
+    : { columns: 6, rows: 2, fps: animation === 'idle' ? 1 : 5 }
 
   return (
     <main className={`pixxy-shell theme-${settings.roomTheme}`} aria-label="Pixxy desktop companion">
       <button
+        ref={petRef}
         className={`pet ${isWalking ? 'is-walking' : ''}`}
         style={{ left: `${petX}px`, transform: `scaleX(${direction})` }}
         type="button"
@@ -214,7 +268,8 @@ export default function App() {
           columns={animationFrameGrid.columns}
           rows={animationFrameGrid.rows}
           fps={animationFrameGrid.fps}
-          loop={animation === 'idle' || animation === 'walk'}
+          loop={animation !== 'idle'}
+          freezeFrame={animation === 'idle' ? 0 : undefined}
           width={150}
           height={190}
           onComplete={() => setAnimation('idle')}
@@ -238,7 +293,10 @@ export default function App() {
         <section className="panel settings-panel" aria-label="Pixxy settings">
           <div className="panel-header">
             <h1>Settings</h1>
-            <button className="close-button" type="button" aria-label="Close settings" onClick={() => setPanel(null)}>×</button>
+            <button className="close-button" type="button" aria-label="Close settings" onClick={() => {
+              setPanel(null)
+              setMouseIgnored(true)
+            }}>×</button>
           </div>
 
           <label className="toggle-row">
@@ -266,12 +324,8 @@ export default function App() {
           </label>
 
           <div className="settings-actions">
-            <button type="button" className="secondary-action" onClick={() => void resetProfile()}>
-              Reset profile
-            </button>
-            <button type="button" className="secondary-action" onClick={() => void restoreDefaults()}>
-              Restore to defaults
-            </button>
+            <button type="button" className="secondary-action" onClick={() => void resetProfile()}>Reset profile</button>
+            <button type="button" className="secondary-action" onClick={() => void restoreDefaults()}>Restore to defaults</button>
           </div>
         </section>
       )}
