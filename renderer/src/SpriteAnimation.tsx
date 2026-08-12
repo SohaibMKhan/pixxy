@@ -8,6 +8,7 @@ type SpriteAnimationProps = {
   loop?: boolean
   width?: number
   height?: number
+  freezeFrame?: number
   onComplete?: () => void
 }
 
@@ -26,9 +27,6 @@ function removeCheckerboard(canvas: HTMLCanvasElement) {
     const minimum = Math.min(red, green, blue)
     const brightness = (red + green + blue) / 3
 
-    // The supplied PNG sheets contain a baked light-gray checkerboard rather
-    // than an alpha channel. Pixxy's colored artwork remains above this
-    // threshold, so key only the low-saturation light background pixels.
     if (maximum - minimum < 22 && brightness > 145) {
       pixels[index + 3] = 0
     }
@@ -45,6 +43,7 @@ export default function SpriteAnimation({
   loop = true,
   width = 240,
   height = 300,
+  freezeFrame,
   onComplete,
 }: SpriteAnimationProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -71,7 +70,7 @@ export default function SpriteAnimation({
       canvas.width = Math.round(width)
       canvas.height = Math.round(height)
 
-      let frame = 0
+      let frame = Math.max(0, Math.min(freezeFrame ?? 0, columns * rows - 1))
       const totalFrames = columns * rows
       const frameDelay = Math.max(30, 1000 / fps)
 
@@ -85,6 +84,7 @@ export default function SpriteAnimation({
         const destinationX = (canvas.width - destinationWidth) / 2
         const destinationY = (canvas.height - destinationHeight) / 2
 
+        context.imageSmoothingEnabled = false
         context.drawImage(
           image,
           (frame % columns) * sourceWidth,
@@ -97,6 +97,8 @@ export default function SpriteAnimation({
           destinationHeight,
         )
         removeCheckerboard(canvas)
+
+        if (freezeFrame !== undefined) return
 
         frame += 1
         if (frame >= totalFrames) {
@@ -117,7 +119,7 @@ export default function SpriteAnimation({
       cancelled = true
       if (timer !== undefined) window.clearTimeout(timer)
     }
-  }, [src, columns, rows, fps, loop, width, height])
+  }, [src, columns, rows, fps, loop, width, height, freezeFrame])
 
   return <canvas ref={canvasRef} className="pixxy-sprite" aria-hidden="true" />
 }
