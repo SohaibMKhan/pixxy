@@ -185,11 +185,13 @@ export default function App() {
 
   if (!ready) return null
 
+  // The supplied idle/walk sheets are 1376×768 with 8 frames arranged 4×2.
+  // The supplied wave sheet is 8 frames arranged 8×1.
   const animationFrameGrid = animation === 'walk'
-    ? { columns: 8, rows: 1, fps: 7 }
+    ? { columns: 4, rows: 2, fps: 7 }
     : animation === 'wave'
       ? { columns: 8, rows: 1, fps: 4 }
-      : { columns: 6, rows: 2, fps: 1 }
+      : { columns: 4, rows: 2, fps: 1 }
 
   return (
     <main className={`pixxy-shell theme-${settings.roomTheme} ${dragEnabled ? 'drag-enabled' : ''}`} aria-label="Pixxy desktop companion">
