@@ -17,6 +17,9 @@ declare global {
         read: () => Promise<PixxySettings>
         update: (settings: Partial<PixxySettings>) => Promise<PixxySettings>
       }
+      window: {
+        setIgnoreMouseEvents: (ignore: boolean) => void
+      }
     }
   }
 }
