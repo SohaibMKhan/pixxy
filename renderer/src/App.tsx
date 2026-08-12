@@ -3,12 +3,9 @@ import SpriteAnimation from './SpriteAnimation'
 import idleSheet from './assets/animations/idle/pixxy_idle.png'
 import blinkSheet from './assets/animations/blink/pixxy_blink.png'
 import bounceSheet from './assets/animations/bounce/pixxy_bounce.png'
-import celebrationSheet from './assets/animations/celebration/pixxy_celebration.png'
-import eatingSheet from './assets/animations/eating/pixxy_eating.png'
 import playfulSheet from './assets/animations/playful/pixxy_playful.png'
-import sleepSheet from './assets/animations/sleep/pixxy_sleep.png'
-import walkSheet from './assets/animations/walk/pixxy_walk_8f.png'
 import waveSheet from './assets/animations/wave/pixxy_wave.png'
+import walkSheet from './assets/animations/walk/pixxy_walk_8f.png'
 
 const initialSettings: PixxySettings = {
   completedOnboarding: false,
@@ -19,38 +16,32 @@ const initialSettings: PixxySettings = {
   launchAtLogin: false,
 }
 
-type AnimationName = 'idle' | 'blink' | 'bounce' | 'celebration' | 'eating' | 'playful' | 'sleep' | 'walk' | 'wave'
+type AnimationName = 'idle' | 'blink' | 'bounce' | 'playful' | 'walk' | 'wave'
+
+type GestureName = Exclude<AnimationName, 'idle' | 'walk'>
 
 const animationSources: Record<AnimationName, string> = {
   idle: idleSheet,
   blink: blinkSheet,
   bounce: bounceSheet,
-  celebration: celebrationSheet,
-  eating: eatingSheet,
   playful: playfulSheet,
-  sleep: sleepSheet,
   walk: walkSheet,
   wave: waveSheet,
 }
 
-const gestureDurations: Record<Exclude<AnimationName, 'idle' | 'walk'>, number> = {
-  blink: 900,
-  bounce: 1500,
-  celebration: 1900,
-  eating: 2400,
-  playful: 2200,
-  sleep: 4200,
-  wave: 1700,
+const gestureDurations: Record<GestureName, number> = {
+  blink: 1100,
+  bounce: 1800,
+  playful: 2400,
+  wave: 2400,
 }
 
 function randomBetween(min: number, max: number) {
   return Math.round(min + Math.random() * (max - min))
 }
 
-function randomGesture(): Exclude<AnimationName, 'idle' | 'walk'> {
-  const gestures: Array<Exclude<AnimationName, 'idle' | 'walk'>> = [
-    'blink', 'bounce', 'playful', 'eating', 'wave', 'celebration', 'sleep',
-  ]
+function randomGesture(): GestureName {
+  const gestures: GestureName[] = ['blink', 'bounce', 'playful', 'wave']
   return gestures[Math.floor(Math.random() * gestures.length)]
 }
 
@@ -60,7 +51,7 @@ export default function App() {
   const [panel, setPanel] = useState<'settings' | 'onboarding' | null>(null)
   const [name, setName] = useState('')
   const [animation, setAnimation] = useState<AnimationName>('idle')
-  const [petX, setPetX] = useState(50)
+  const [petX, setPetX] = useState(40)
   const [direction, setDirection] = useState<1 | -1>(1)
   const clickTimer = useRef<number | undefined>(undefined)
 
@@ -89,12 +80,14 @@ export default function App() {
 
     const timer = window.setInterval(() => {
       setPetX((current) => {
-        const width = 190
-        const max = Math.max(16, window.innerWidth - width - 16)
-        const next = current + direction * 2.2
-        if (next <= 16) {
+        const width = 150
+        const margin = 8
+        const max = Math.max(margin, window.innerWidth - width - margin)
+        const next = current + direction * 1.7
+
+        if (next <= margin) {
           setDirection(1)
-          return 16
+          return margin
         }
         if (next >= max) {
           setDirection(-1)
@@ -102,7 +95,7 @@ export default function App() {
         }
         return next
       })
-    }, 40)
+    }, 45)
 
     return () => window.clearInterval(timer)
   }, [animation, direction, panel, ready])
@@ -116,29 +109,30 @@ export default function App() {
     })
 
     const run = async () => {
+      // A slower first wave gives the user time to notice Pixxy's arrival.
       setAnimation('wave')
-      await wait(1700)
+      await wait(2400)
       if (cancelled) return
 
       setAnimation('idle')
-      await wait(randomBetween(3500, 5500))
+      await wait(randomBetween(5000, 7500))
 
       while (!cancelled) {
-        const shouldWalk = Math.random() < 0.55
+        const shouldWalk = Math.random() < 0.52
         if (shouldWalk) {
           setDirection(Math.random() > 0.5 ? 1 : -1)
           setAnimation('walk')
-          await wait(randomBetween(4200, 8000))
+          await wait(randomBetween(5000, 9000))
           if (cancelled) break
           setAnimation('idle')
-          await wait(randomBetween(1600, 3000))
+          await wait(randomBetween(2500, 5000))
         } else {
           const gesture = randomGesture()
           setAnimation(gesture)
           await wait(gestureDurations[gesture])
           if (cancelled) break
           setAnimation('idle')
-          await wait(randomBetween(2200, 5000))
+          await wait(randomBetween(4500, 8000))
         }
       }
     }
@@ -162,6 +156,26 @@ export default function App() {
     setAnimation('wave')
   }
 
+  async function resetProfile() {
+    const saved = await window.pixxy.settings.update({
+      completedOnboarding: false,
+      displayName: '',
+    })
+    setSettings(saved)
+    setName('')
+    setPanel('onboarding')
+  }
+
+  async function restoreDefaults() {
+    const saved = await window.pixxy.settings.update({
+      roomTheme: 'meadow',
+      alwaysOnTop: false,
+      desktopAwarenessEnabled: false,
+      launchAtLogin: false,
+    })
+    setSettings(saved)
+  }
+
   function handlePetClick() {
     if (clickTimer.current !== undefined) window.clearTimeout(clickTimer.current)
     clickTimer.current = window.setTimeout(() => {
@@ -181,7 +195,9 @@ export default function App() {
   if (!ready) return null
 
   const isWalking = animation === 'walk'
-  const animationFrameGrid = animation === 'wave' ? { columns: 8, rows: 1, fps: 8 } : { columns: 4, rows: 2, fps: 6 }
+  const animationFrameGrid = animation === 'wave'
+    ? { columns: 8, rows: 1, fps: 5 }
+    : { columns: 4, rows: 2, fps: animation === 'idle' ? 3.5 : 5 }
 
   return (
     <main className={`pixxy-shell theme-${settings.roomTheme}`} aria-label="Pixxy desktop companion">
@@ -199,8 +215,8 @@ export default function App() {
           rows={animationFrameGrid.rows}
           fps={animationFrameGrid.fps}
           loop={animation === 'idle' || animation === 'walk'}
-          width={190}
-          height={225}
+          width={150}
+          height={190}
           onComplete={() => setAnimation('idle')}
         />
       </button>
@@ -238,22 +254,22 @@ export default function App() {
             <input type="checkbox" checked={settings.desktopAwarenessEnabled} onChange={(event) => void update({ desktopAwarenessEnabled: event.target.checked })} />
           </label>
           <label className="theme-label">
-            Room theme
+            Pixxy palette
             <select value={settings.roomTheme} onChange={(event) => void update({ roomTheme: event.target.value as PixxySettings['roomTheme'] })}>
               <option value="meadow">Meadow</option>
               <option value="moonlight">Moonlight</option>
               <option value="sunset">Sunset</option>
+              <option value="ocean">Ocean</option>
+              <option value="lavender">Lavender</option>
+              <option value="peach">Peach</option>
             </select>
           </label>
 
           <div className="settings-actions">
-            <button type="button" className="secondary-action" onClick={() => {
-              setName('')
-              void update({ displayName: '' })
-            }}>
+            <button type="button" className="secondary-action" onClick={() => void resetProfile()}>
               Reset profile
             </button>
-            <button type="button" className="secondary-action" onClick={() => void update({ roomTheme: 'meadow', alwaysOnTop: false, desktopAwarenessEnabled: false, launchAtLogin: false })}>
+            <button type="button" className="secondary-action" onClick={() => void restoreDefaults()}>
               Restore to defaults
             </button>
           </div>
