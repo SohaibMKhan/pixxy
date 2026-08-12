@@ -5,6 +5,15 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'renderer/**'
+      - 'app/**'
+      - 'assets/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'electron.vite.config.ts'
+      - 'electron-builder.yml'
+      - '.github/workflows/build-test.yml'
 
 permissions:
   contents: read
