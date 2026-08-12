@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('pixxy', {
     update: (settings: Record<string, unknown>) => ipcRenderer.invoke('settings:update', settings),
   },
   window: {
-    setIgnoreMouseEvents: (ignore: boolean) => ipcRenderer.send('window:set-ignore-mouse', ignore),
+    setSettingsOpen: (open: boolean) => ipcRenderer.send('window:set-settings-open', open),
+    moveBy: (delta: number) => ipcRenderer.invoke('window:move-by', delta) as Promise<{ x: number; hitBoundary: boolean }>,
   },
 })
