@@ -1,40 +1,43 @@
 # 🐾 Pixxy
 
-> **A tiny digital life that lives on your desktop.**
+> **A useful digital companion that lives on your desktop.**
 >
-> A desktop-first virtual pet and local AI companion that remembers you, reacts to your activity, grows with you, and remains useful even when AI is turned off.
+> Pixxy is a Windows desktop companion designed to feel alive, be genuinely useful, and remain local-first. It combines a persistent desktop character with reminders, task-based progress, desktop awareness, file & folder awareness, and an optional local AI layer.
 
-**🐾 The pet is the product. AI makes the pet smarter and more alive.**
+**🐾 The pet is the personality. The utility makes Pixxy useful. AI makes Pixxy smarter.**
 
 <div align="center">
 
 <img src="renderer/src/assets/character/reference/pixxy_approved_reference.png" alt="Pixxy character reference" width="420" />
 
-*Current canonical Pixxy character reference — crisp pixel-art desktop companion.*
+*Canonical Pixxy character reference*
 
 </div>
 
-[What is Pixxy?](#-what-is-pixxy) • [MVP](#-mvp) • [Architecture](#-architecture) • [Roadmap](#-roadmap) • [Development Workflow](#-development-workflow)
+[What is Pixxy?](#-what-is-pixxy) • [Core Features](#-core-features) • [Architecture](#-architecture) • [Roadmap](#-roadmap) • [Development Workflow](#-development-workflow)
 
 ---
 
 ## ✨ What is Pixxy?
 
-Pixxy is a **Windows desktop virtual pet + digital companion**. It appears directly on your desktop as a small animated creature with needs, moods, personality, memory, a room, games, rewards, and evolving behavior.
+Pixxy is a **Windows desktop companion** that lives directly on the user's desktop. It is designed to be more than a decorative virtual pet: Pixxy can react to interaction, provide useful reminders, understand selected desktop context, help locate files and folders, react to supported AI-agent activity, and provide lightweight task-based motivation.
 
-The AI layer is intentionally optional. Pixxy's core pet mechanics, state, games, economy, events, animations, and privacy controls work without an LLM.
+The AI layer is intentionally optional. Pixxy's core interaction, reminders, persistence, desktop awareness, file/folder awareness, and task-streak features are designed to work locally without requiring an LLM.
 
-💡 **Why Pixxy is different**
+### Why Pixxy is different
 
-| Traditional AI chatbot | Pixxy |
+| Traditional AI assistant | Pixxy |
 | --- | --- |
-| AI is the product | 🐾 The virtual pet is the product |
-| Usually cloud-first | 🔒 Local-first by design |
-| Stateless conversations | 🧠 Persistent local memory |
-| Avatar around a chatbot | 🌎 A persistent digital world |
-| AI controls behavior | ⚙️ Deterministic pet engine controls core state |
-| Little reason to return | 🎮 Games, rewards, room, progression |
-| Passive interaction | 🖥️ Optional desktop awareness |
+| AI is the main product | 🐾 The character is the personality and interface |
+| Often cloud-first | 🔒 Local-first by design |
+| Mostly conversational | 🖥️ Lives directly on the desktop |
+| Utility hidden behind a chat UI | ✨ Utility expressed through the companion |
+| Generic notifications | 🐾 Contextual character reactions |
+| No persistent visual presence | 👀 Persistent desktop presence |
+| General productivity tools | 🎯 Task-based streaks and fixed rewards |
+| AI must perform everything | ⚙️ Deterministic systems handle core behavior |
+
+Pixxy takes inspiration from desktop companions such as Comnyang, while defining its own direction around **usefulness, local-first AI, task progression, desktop awareness, and a robot companion identity**.
 
 ---
 
@@ -42,58 +45,176 @@ The AI layer is intentionally optional. Pixxy's core pet mechanics, state, games
 
 > **Pixxy should never become simply “a cute UI around an LLM.”**
 
-- 🐾 Pixxy must remain fun with AI completely disabled.
+- 🐾 The character remains central.
 - 🧠 AI is an intelligence layer, not the entire product.
 - 🔒 Local-first data handling is the default.
 - 👤 Users control what Pixxy remembers and observes.
-- ⚙️ Core pet state is deterministic and independent of the LLM.
+- ⚙️ Core behavior is deterministic and independent of the LLM.
 - 💤 Pixxy should feel alive without becoming annoying or intrusive.
-- 🚀 Ship a small, polished, installable MVP before expanding the scope.
+- 🎯 Every utility feature should have a clear purpose.
+- 🚫 No unnecessary pet-maintenance mechanics.
+- 🚫 No autonomous wandering or constant walking.
+- 🚀 Build the defined final product rather than repeatedly expanding an MVP.
 
 ---
 
-## 🧩 Core Systems
+## 🧩 Core Features
 
-- **Pet Engine** — needs, moods, state transitions, personality, evolution.
-- **Desktop Engine** — high-level active-app, idle-time, session and desktop-state awareness.
-- **Memory Engine** — local memories, preferences, projects and interactions.
-- **AI Engine** — optional local LLM conversation and contextual responses.
-- **Game Engine** — mini-games and gameplay mechanics.
-- **Economy Engine** — XP, coins, rewards and unlockables.
-- **Event Engine** — discoveries, gifts, surprises and scripted events.
-- **UI Layer** — transparent pet window, room, menus, dashboard and settings.
-- **Asset System** — characters, animations, furniture, rooms, sounds and icons.
+### 🐾 Desktop Companion
+
+- Crisp pixel-art Pixxy character
+- Stable idle behavior
+- Natural blinking and subtle micro-motion
+- 👀 Eye-follow behavior
+- 👋 Wave reactions
+- 🖱️ Hover-to-pet interaction
+- 🖱️ Deliberate drag/repositioning
+- ⌨️ Keyboard kneading reaction
+- 🌡️ Overheat mode
+- Right-click menu
+- First-launch name setup
+- Multiple Pixxy color variants
+
+### ⏰ Useful Reminders
+
+- 🧘 Stretch reminder
+- 💧 Drink-water reminder
+- 🔔 Custom message/time reminder
+- Optional reminder sounds
+- Snooze/dismiss behavior
+
+### 🤖 AI-Agent Reactions
+
+Pixxy can visually react to supported AI activity:
+
+**THINKING ALONG**
+
+When a supported AI agent is thinking or processing a task, Pixxy switches to a thinking state.
+
+**AGENT DONE**
+
+When the supported agent finishes a task, Pixxy performs a short happy-hop/success reaction and can optionally make a sound.
+
+AI remains optional. Pixxy must remain useful with AI completely disabled.
+
+### 📁 File & Folder Awareness
+
+Pixxy can optionally maintain a **local index of user-selected folders** so it can answer natural-language questions such as:
+
+> “Pixxy, where is my Power BI dashboard?”
+
+Pixxy can search the local index and return the file's exact location.
+
+The system is designed to:
+
+- Index user-selected folders/drives locally
+- Track file and folder names and paths
+- Track relevant creation/modification information
+- Detect relevant move, rename and deletion changes
+- Search the index using natural-language queries
+- Return exact file/folder paths
+- Optionally open a file or containing folder when explicitly requested
+- Keep the index local and privacy-controlled
+- Avoid reading document contents merely to answer location questions
+
+### 🎯 Task-Based Streaks
+
+Pixxy does **not** use a traditional virtual-pet economy.
+
+Instead:
+
+- Users complete qualifying tasks
+- Daily completion contributes to a streak
+- Fixed milestones unlock predefined rewards
+- Rewards can be cosmetic Pixxy variants, reactions, badges or other fixed unlocks
+- 🪙 No coins
+- 💰 No money system
+- ⭐ No XP system
+- 🎰 No random loot economy
 
 ---
 
-## 🚀 MVP
+## 🚫 Explicitly Removed From the Final Direction
 
-The first release is deliberately small.
+The following systems are intentionally **not part of Pixxy's product direction**:
 
-### Must Have
+- ❌ Autonomous walking
+- ❌ Rooms
+- ❌ Room themes
+- ❌ Furniture
+- ❌ Inventory tied to a room
+- ❌ Food / feeding logic
+- ❌ Hunger
+- ❌ Generic pet-maintenance needs
+- ❌ Game engine
+- ❌ Mini-games
+- ❌ Coins
+- ❌ XP
+- ❌ Money/economy system
+- ❌ Generic event engine for discoveries/gifts/surprises
 
-- 🖥️ Transparent desktop pet window
-- 🐹 Pixxy character
-- ✨ Idle animation
-- 🖱️ Click interaction
-- 🏠 Basic room
-- 🍎 Hunger
-- ⚡ Energy
-- ❤️ Happiness
-- 😊 Mood engine
-- 💾 Basic local memory
-- 🗃️ SQLite persistence
-- 🖥️ Application awareness
-- 💬 Rule-based reactions
-- 🪙 Coins
-- 🎮 One polished mini-game
-- ⚙️ Settings
-- 🪟 Windows startup option
-- 🧠 Optional local AI
+This keeps Pixxy focused on being a **useful desktop companion** instead of becoming a large simulated-pet game.
 
-### Explicitly out of MVP
+---
 
-Evolution • Multiple species • Large furniture catalogue • Mobile app • Multiplayer • Cloud sync • Large agentic system • Voice assistant • Many mini-games • Social network
+## 🎬 Animation Philosophy
+
+Pixxy should feel **alive, not like a looping movie reel**.
+
+Autonomous walking has been intentionally removed. Pixxy should normally remain stationary and use a small set of meaningful reactions.
+
+```text
+Launch
+  ↓
+Wave once
+  ↓
+Stable idle
+  ↓
+Blink / subtle micro-motion
+  ↓
+User or system interaction
+  ↓
+Specific reaction
+  ↓
+Return cleanly to idle
+```
+
+Examples:
+
+```text
+IDLE → PET → IDLE
+
+IDLE → THINKING → AGENT DONE → IDLE
+
+IDLE → STRETCH → IDLE
+
+IDLE → WATER REMINDER → IDLE
+
+IDLE → MESSAGE REMINDER → IDLE
+```
+
+High-priority interactions interrupt low-priority idle behavior and then return cleanly to the previous state.
+
+There should be **no oversized invisible container**, no desktop-blocking hitbox, no sliding sprite/movie-reel movement, and no visible clipping around Pixxy.
+
+---
+
+## 🖥️ Desktop Interaction Model
+
+Pixxy is intended to coexist naturally with the Windows desktop.
+
+### Interaction rules
+
+- Pixxy stays at its chosen position by default.
+- The interaction/hitbox closely follows the visible character.
+- Everything outside the character remains clickable.
+- Hovering over Pixxy's head can trigger petting.
+- Single click can trigger a wave/attention reaction.
+- Right-click opens the Pixxy menu.
+- Deliberate dragging allows Pixxy to be repositioned.
+- Settings must never leave an invisible blocking area after opening/closing.
+
+The desktop should never feel like Pixxy has taken over half the screen.
 
 ---
 
@@ -102,44 +223,64 @@ Evolution • Multiple species • Large furniture catalogue • Mobile app • 
 Pixxy is designed to work **without an AI model**.
 
 ```text
-                 PIXXY
-                   │
-          ┌────────┴────────┐
-          │                 │
-     VIRTUAL PET         LOCAL AI
-          │                 │
-     Needs / Mood      Conversation
-     Room / Games      Memory / Context
-     Economy           Personality
-     Events
-          │
-          └───────┬─────────┘
-                  ↓
-             DESKTOP WORLD
+                    PIXXY
+                      │
+        ┌─────────────┼─────────────┐
+        │             │             │
+   CHARACTER       UTILITY       AI BRIDGE
+        │             │             │
+   Idle / Pet      Reminders    Local LLM / Agents
+   Wave / Eye      Tasks        Thinking / Done
+   Reactions       Streaks      Context
+   Palettes        File Search  Personality
+        │             │             │
+        └─────────────┼─────────────┘
+                      ↓
+                DESKTOP WORLD
+                      │
+               LOCAL PERSISTENCE
+                      ↓
+                    SQLite
 ```
 
-The initial AI integration is planned around an **Ollama adapter**, behind a provider interface so the rest of the application is not tightly coupled to one runtime.
+The initial AI integration is planned around a provider interface with an **Ollama adapter** as the local-first route. The rest of Pixxy should not be tightly coupled to one AI runtime.
 
 Runtime/model packaging and redistribution terms must be verified before shipping an installer that automatically installs AI components.
 
 ---
 
-## 🛠️ Technology Stack
+## 🏗️ Architecture
+
+### Core systems
+
+- **Desktop Companion Engine** — window behavior, interaction, positioning and desktop coexistence.
+- **Character Engine** — idle, reactions, animation state and visual variants.
+- **Reminder Engine** — stretch, water and custom message reminders.
+- **Task & Streak Engine** — qualifying tasks, daily streaks and fixed unlocks.
+- **Desktop Awareness Engine** — active application, idle time and selected high-level desktop context.
+- **File & Folder Awareness Engine** — local index of user-selected folders for file-location questions.
+- **Memory Engine** — local preferences and explicitly stored memories.
+- **AI Bridge** — optional local LLM/agent provider integration.
+- **UI Layer** — transparent desktop companion, right-click menu, settings and configuration.
+- **Asset System** — canonical Pixxy character, animations, palettes, sounds and icons.
+- **Persistence Layer** — SQLite local storage.
+
+### Technology Stack
 
 | Layer | Technology | Purpose |
 | --- | --- | --- |
-| Desktop shell | **Electron** | Transparent window, tray, Windows integration |
-| Frontend | **React + TypeScript** | UI, room, menus, settings, dashboard |
-| Application logic | **Node.js + TypeScript** | Pet engine, services, orchestration |
-| Database | **SQLite** | Local persistent storage |
-| AI runtime | **Ollama adapter** | Local LLM integration |
-| Assets | **PNG / SVG / Sprite Sheets** | Character, room, furniture and UI |
+| Desktop shell | **Electron** | Transparent window, tray and Windows integration |
+| Frontend | **React + TypeScript** | UI and companion controls |
+| Application logic | **Node.js + TypeScript** | Core services and orchestration |
+| Database | **SQLite** | Local persistence |
+| AI runtime | **Ollama adapter** | Optional local LLM integration |
+| Assets | **PNG / SVG / Sprite Sheets** | Character and UI assets |
 | Packaging | **Electron Builder** | Windows installer/executable |
 | CI/CD | **GitHub Actions** | Automated Windows test builds and releases |
 
 ---
 
-## 🗂️ Current Project Structure
+## 🗂️ Project Structure
 
 ```text
 pixxy/
@@ -149,290 +290,75 @@ pixxy/
 │   └── src/
 │       ├── assets/           # Canonical renderer assets
 │       └── ...               # React renderer
-├── database/                 # Local database layer
+├── database/                 # Local persistence layer
 ├── installer/                # Packaging / installer configuration
 ├── docs/                     # Product and execution documentation
 ├── .github/
-│   └── workflows/            # GitHub Actions CI/CD
+│   └── workflows/            # GitHub Actions
 └── package.json
 ```
 
-The renderer asset pipeline is intentionally kept under `renderer/src/assets/` so the desktop renderer has one clear canonical location for Pixxy's visual assets.
-
----
-
-## 🗺️ Roadmap
-
-### Phase 0 — 📋 Product Specification
-
-- Detailed PRD
-- Pixxy personality definition
-- Target audience
-- Privacy model
-- MVP boundaries
-- UI/UX flow
-- Pet mechanics
-- Technical architecture
-
-### Phase 1 — 🎨 Character & Visual Assets
-
-- Visual brief
-- Character concepts
-- Final design
-- Character sheet
-- Expression sheet
-- Animation references
-- Transparent base assets
-- Sprite sheets
-- Initial room
-- Furniture and UI assets
-
-**Current focus:** finalizing the production-quality Pixxy character assets and integrating them into the desktop pet behavior system.
-
-### Phase 2 — 🖥️ Desktop Shell
-
-- Electron project
-- Transparent frameless window
-- Always-on-top option
-- Controlled desktop interaction area
-- Natural bottom-area movement
-- Dragging behavior
-- Scaling
-- System tray
-- Hide/show
-- Startup option
-
-### Phase 3 — 🐾 Pet Engine
-
-- Pet state model
-- Hunger
-- Energy
-- Happiness
-- Social / curiosity / boredom
-- Mood rules
-- State transitions
-- Mood-driven animation
-- Natural autonomous behavior
-- Interruptible user interactions
-
-### Phase 4 — 💾 Database & Persistence
-
-- SQLite schema
-- Database initialization
-- Repositories/services
-- Pet state persistence
-- User settings persistence
-- Coins and XP persistence
-- Room persistence
-- Events and achievements
-- Restart persistence tests
-
-### Phase 5 — 🖥️ Desktop Awareness
-
-- Active application detection
-- Idle detection
-- Session tracking
-- Lock/unlock awareness
-- Privacy controls
-- Rule-based reactions
-- Multi-application testing
-
-### Phase 6 — 🧠 Personality & Memory
-
-- Personality traits
-- Interaction history
-- Explicit memory creation
-- Memory retrieval
-- Memory management UI
-- Memory deletion
-- Behavior connection
-
-### Phase 7 — 🏠 Room & Economy
-
-- Room scene
-- Furniture placement
-- Inventory
-- XP
-- Coins
-- Achievements
-- Unlockable items
-- Productivity rewards
-
-### Phase 8 — 🎮 Mini-Game
-
-**First game: Catch the Falling Food**
-
-- Controls
-- Scoring
-- Rewards
-- High score
-- Pixxy reactions
-- Performance testing
-
-### Phase 9–10 — 🤖 Local AI & Personality
-
-- AI provider interface
-- Ollama integration
-- Runtime detection
-- Model configuration
-- Context builder
-- Pixxy system/personality prompt
-- Conversation UI
-- AI fallback behavior
-- Mood/personality injection
-- Memory context
-- Desktop context where permitted
-- Response limits
-
-### Phase 11–13 — 📦 Installer, QA & Beta
-
-- Production build
-- Windows installer
-- Prerequisite checks
-- Hardware detection
-- Optional AI setup
-- Clean install testing
-- Upgrade testing
-- Offline testing
-- Multi-monitor testing
-- DPI/scaling testing
-- Privacy audit
-- Beta release
-- Feedback loop
-
----
-
-## 🔄 Development Workflow
-
-Pixxy uses a **GitHub-first development workflow**. For the current testing phase, changes are made in GitHub and GitHub Actions compiles a Windows test artifact automatically. Local compilation is optional and mainly reserved for deeper debugging when needed.
-
-```text
-Changes
-   ↓
-GitHub main/source
-   ↓
-GitHub Actions
-   ↓
-Windows test build
-   ↓
-pixxy-windows-test artifact
-   ↓
-Download + test .exe/package
-   ↓
-Feedback
-   ↓
-Fix
-   ↺
-
-When stable
-   ↓
-v0.1.0
-   ↓
-Production GitHub Actions build
-   ↓
-Windows installer/release
-```
-
-### Automatic test builds
-
-The Windows test build is configured to run automatically when **application-related files** change on `main`, such as:
-
-- `app/**`
-- `renderer/**`
-- runtime/application assets
-- package/build configuration
-- GitHub Actions build configuration
-
-Documentation-only changes such as `README.md` do **not** need to consume a Windows build.
-
-A manual workflow trigger remains available when a build is needed without an application change.
-
-### Local development
-
-Local development is still supported for debugging:
-
-```bash
-npm ci
-npm run dev
-```
-
-The normal product-testing loop, however, is GitHub → Actions → Windows artifact → test → feedback → fix.
+The renderer asset pipeline is intentionally kept under `renderer/src/assets/` as the canonical location for Pixxy's visual assets.
 
 ---
 
 ## 🎨 Pixxy Character Design
 
-Pixxy's visual direction is **crisp modern pixel art** with a consistent silhouette, expressive face, controlled palette and transparent production assets.
+Pixxy uses **crisp, modern pixel art** with a consistent silhouette, expressive face, controlled palette and transparent production assets.
 
-The character pipeline is modular:
+The character pipeline is:
 
 **Base character → expressions → poses → animation frames → effects → accessories**
 
-### Character example
-
 <div align="center">
 
-<img src="renderer/src/assets/character/reference/pixxy_approved_reference.png" alt="Canonical Pixxy character example" width="420" />
+<img src="renderer/src/assets/character/reference/pixxy_approved_reference.png" alt="Canonical Pixxy character" width="420" />
 
-**Canonical Pixxy character example**
+**Canonical Pixxy character reference**
 
 </div>
 
-The repository also contains the broader character reference material and animation asset pipeline. As the final transparent PNG assets are uploaded, the production folders will become the source of truth for runtime animation.
+### Planned color variants
 
-### Planned character families
+- 🟦 Default canonical Pixxy
+- 🎨 Variant 2
+- 🎨 Variant 3
 
-- 👋 Wave
-- 🧍 Idle / neutral
-- 🚶 Walk
-- 👀 Blink
-- 🎉 Celebrate
-- 🎮 Play
-- 🍎 Eat
-- 😴 Sleep
-- ✨ Special effects / reactions
-
-The desktop MVP intentionally keeps autonomous behavior focused on a small number of natural gestures rather than constantly playing large or distracting animations.
+The variants should preserve the same canonical character design rather than creating unrelated characters.
 
 ---
 
-## 🕹️ Desktop Pet Behavior
+## 🖥️ Desktop Awareness
 
-The desktop pet should feel **alive, not like a looping movie reel**.
+Pixxy can react to high-level desktop context such as:
 
-The intended behavior model is:
+- Active application/window
+- Idle time
+- Session duration
+- Computer lock/unlock
+- Startup/shutdown
+- Application switching patterns
+- Supported AI-agent activity
 
-```text
-Launch
-  ↓
-Wave once
-  ↓
-Stable idle
-  ↓
-Occasional blink / small gesture
-  ↓
-Walk naturally across the allowed bottom area
-  ↓
-Turn at boundary
-  ↓
-Stable idle / short gesture
-  ↓
-Repeat naturally
-```
+### File & Folder Awareness
 
-User interaction interrupts the autonomous flow cleanly:
+File awareness is a dedicated part of desktop awareness.
 
-```text
-Autonomous behavior
-        ↓
-     User click
-        ↓
-  Interaction gesture
-        ↓
-Resume previous behavior
-```
+Pixxy should be able to answer:
 
-The character should never visually appear trapped inside a large invisible box, and the desktop should remain clickable outside the small interaction region around Pixxy.
+> “Where is my Pixxy blueprint?”
+
+> “Where did I save the sales dashboard?”
+
+> “Where is the folder for this project?”
+
+The deterministic file-awareness service searches the local index. The AI layer can interpret the user's natural-language question and communicate the result, but the AI does not need to independently scan the filesystem.
+
+### Privacy
+
+File awareness should be **opt-in and scoped to user-selected folders/drives**. Basic location queries do not require reading document contents.
+
+Pixxy should avoid collecting document contents, passwords, or sensitive content merely to provide file-location awareness.
 
 ---
 
@@ -447,106 +373,224 @@ Users should be able to control whether Pixxy can:
 - Remember productivity patterns
 - Remember conversations
 - Automatically create memories
+- Index selected folders
 - View stored memories
 - Delete individual memories
 - Delete all Pixxy data
+- Disable desktop awareness
+- Disable AI integrations
 
-### 🚫 MVP does not need
-
-Pixxy should avoid collecting **document contents, keystrokes, passwords, or sensitive content**. Desktop awareness should focus on high-level signals and remain opt-in/configurable.
+The goal is for Pixxy to be useful without requiring users to surrender their data to a cloud service.
 
 ---
 
-## 🎮 Core Pet Mechanics
+## 🗺️ Final Implementation Plan
 
-| Need | Range | Example state |
-| --- | --- | --- |
-| Hunger | 0–100 | Hungry below threshold |
-| Energy | 0–100 | Sleepy below threshold |
-| Happiness | 0–100 | Excited when high |
-| Social | 0–100 | Lonely when low |
-| Curiosity | 0–100 | Drives exploration |
-| Boredom | 0–100 | Drives interaction |
+The project is no longer being treated as an open-ended MVP. The following steps define the intended path to the final product.
 
-Mood is **state-driven**, not LLM-driven.
+### Step 1 — Scope & Cleanup
+
+Remove the old room, game, food, hunger, economy, coin, XP, furniture and autonomous-walking systems from the active product direction.
+
+### Step 2 — Desktop Shell & Hitbox
+
+- Tight Pixxy interaction region
+- No oversized invisible blocker
+- Correct taskbar behavior
+- Correct settings open/close behavior
+- Clean dragging/repositioning
+- Stable transparent window
+
+### Step 3 — Character & Animation
+
+- Stable idle
+- Blink / subtle micro-motion
+- Wave
+- Eye follow
+- Hover-to-pet
+- Keyboard kneading
+- Overheat mode
+- Agent thinking
+- Agent done
+- Reminder reactions
+- No autonomous walking
+
+### Step 4 — Interaction System
+
+- Right-click menu
+- Single-click wave
+- Hover petting
+- Deliberate drag
+- State priority/interruption system
+- Clean return to idle
+
+### Step 5 — Reminder Engine
+
+- Stretch reminder
+- Water reminder
+- Custom message/time reminder
+- Snooze/dismiss
+- Optional sounds
+
+### Step 6 — Task Streaks
+
+- Qualifying daily tasks
+- Consecutive-day streak
+- Fixed milestone rewards
+- Cosmetic/behavioral unlocks
+- No coins
+- No XP
+- No money
+
+### Step 7 — Pixxy Variants
+
+- Preserve canonical design
+- Add two additional crisp color variants
+- Palette selection and persistence
+
+### Step 8 — Desktop & File Awareness
+
+- Active application detection
+- Idle/session awareness
+- User-selected folder indexing
+- File/folder path search
+- Move/rename/delete detection
+- Natural-language file-location queries
+- Privacy controls
+
+### Step 9 — AI Bridge
+
+- Provider interface
+- Ollama integration
+- Runtime detection
+- Model configuration
+- Context builder
+- Thinking reaction
+- Agent-done reaction
+- Optional memory context
+
+### Step 10 — Personalization & Polish
+
+- First-launch name setup
+- Settings
+- Sound preferences
+- Palette preferences
+- Reminder preferences
+- Startup option
+- Taskbar/tray behavior
+- DPI/scaling
+- Multi-monitor testing
+- Animation timing
+- Pixel sharpness
+
+### Step 11 — Automated Test Build
+
+GitHub Actions compiles a Windows test artifact. The packaged application is downloaded and tested as the real user-facing build.
+
+### Step 12 — Final Release
+
+Only after the test build is stable and accepted:
 
 ```text
-Hunger < 20       → Hungry
-Energy < 15       → Sleepy
-Happiness > 80
-+ Energy > 50     → Excited
-Social < 20       → Lonely
-Healthy state     → Happy
+Final changes
+    ↓
+v0.1.0
+    ↓
+GitHub Actions
+    ↓
+Windows production build
+    ↓
+GitHub Release
+    ↓
+Users download Pixxy
 ```
 
 ---
 
-## 🖥️ Desktop Awareness
+## 🔄 Development Workflow
 
-Pixxy may react to high-level signals such as:
+Pixxy uses a **GitHub-first workflow**.
 
-- Active application/window
-- Idle time
-- Session duration
-- Computer lock/unlock
-- Startup/shutdown
-- Application switching patterns
+```text
+Changes
+   ↓
+GitHub main/source
+   ↓
+GitHub Actions
+   ↓
+Windows test build
+   ↓
+Download .exe/package
+   ↓
+Test Pixxy
+   ↓
+Report issues
+   ↓
+Fix
+   ↺
 
-Examples:
+When satisfied
+   ↓
+v0.1.0
+   ↓
+Production build
+   ↓
+GitHub Release
+```
 
-> **VS Code** → “Coding again?”  
-> **Power BI** → “Dashboard time!”  
-> **Excel** → “Rows and columns... exciting.”  
-> **Spotify** → “Okay, DJ.”  
-> **Long focus session** → “You've been working for a while.”
+### Automated test builds
 
-These reactions can initially be completely rule-based.
+The Windows test build should run for **application-related changes**, while documentation-only changes such as `README.md` should not consume a Windows build.
+
+Typical build-triggering paths include:
+
+- `app/**`
+- `renderer/**`
+- runtime/application assets
+- package/build configuration
+- GitHub Actions build configuration
+
+A manual workflow trigger remains available when a build is needed without an application change.
+
+### Local development
+
+Local development remains available for deeper debugging:
+
+```bash
+npm ci
+npm run dev
+```
+
+The preferred product-testing loop is:
+
+**GitHub → Actions → Windows artifact → test → feedback → fix.**
 
 ---
 
-## 🪙 Progression
+## 🧪 Definition of Done
 
-### XP
+Pixxy's final product direction is considered complete when:
 
-- Focus session
-- Complete a task
-- Daily streak
-- Return to Pixxy
-- Take a healthy break
-- Unlock achievements
-
-### Coins
-
-| Action | Reward |
-| --- | ---: |
-| 30-minute focus session | +10 |
-| Complete task | +20 |
-| Daily login | +5 |
-| Mini-game | +2 |
-| Achievement | +50 |
-
-Coins can unlock hats, accessories, plants, furniture, room themes and special items.
-
----
-
-## 🛡️ Definition of Done — MVP
-
-- Installs successfully on a clean Windows machine
-- Appears as a transparent desktop companion
-- Has polished idle and interaction animations
-- Pet state changes over time
-- Mood changes according to state
-- User interactions affect Pixxy
-- State persists after restart
-- Basic desktop context detection works when enabled
-- Selected applications trigger local reactions
-- User earns and spends coins
-- One mini-game is playable
-- Basic memory works locally
-- Privacy controls are visible and functional
-- Pixxy works without an AI model
-- Optional local AI works for conversation
-- Production installer installs/uninstalls cleanly
+- First launch asks for and persists the user's name.
+- Pixxy is crisp and never visibly clipped.
+- No oversized invisible hitbox blocks the desktop.
+- Settings open/close without invisible UI leftovers.
+- Pixxy does not autonomously walk.
+- Eye-follow behavior feels natural.
+- Hovering Pixxy's head pets it.
+- Single click can trigger a wave.
+- Right-click opens the menu.
+- Dragging works deliberately without blocking the desktop.
+- Keyboard kneading reacts correctly and returns to idle.
+- Overheat mode triggers under its defined condition and exits cleanly.
+- Stretch, water and message reminders work.
+- Task streaks persist locally and unlock fixed rewards.
+- At least three Pixxy color variants are selectable.
+- File & Folder Awareness can locate files in user-selected indexed folders and return their paths accurately.
+- AI thinking and task-complete reactions work when an adapter is connected.
+- Pixxy remains useful with AI disabled.
+- Packaged Windows test artifact launches correctly.
+- Formal GitHub release installs/uninstalls cleanly.
 
 ---
 
@@ -554,7 +598,8 @@ Coins can unlock hats, accessories, plants, furniture, room themes and special i
 
 | Document | Purpose |
 | --- | --- |
-| `docs/MVP_EXECUTION_PLAN.md` | Current product execution plan and staged implementation |
+| `docs/PIXXY_FINAL_PRODUCT_BLUEPRINT.md` | Final product direction and implementation blueprint |
+| `docs/MVP_EXECUTION_PLAN.md` | Existing execution documentation during the transition |
 | `renderer/src/assets/README.md` | Renderer asset pipeline and organization |
 | `.github/workflows/build-test.yml` | Automated Windows test artifact workflow |
 | `.github/workflows/build-and-release.yml` | Production release workflow |
@@ -563,27 +608,19 @@ Coins can unlock hats, accessories, plants, furniture, room themes and special i
 
 ## 🌱 Future Vision
 
-### V1
+Future versions may explore additional characters, richer personality, more desktop reactions, improved memory, voice interaction, optional encrypted sync and other extensions.
 
-Evolution, more rooms, accessories, games, improved memory, better AI, sound and themes.
-
-### V2
-
-Multiple species, personality variations, dynamic world, stories, events and collectibles.
-
-### V3
-
-Optional mobile companion, encrypted sync, voice interaction, multiple Pixxies and optional community features.
+These are deliberately outside the current final-product implementation scope until the core Pixxy experience is stable.
 
 ---
 
 ## ⭐ The North Star
 
-> **Pixxy should feel like a small digital life that exists independently of the AI model.**
+> **Pixxy should feel like a small digital companion that exists independently of the AI model — while actually helping you get things done.**
 
-The strongest architecture is therefore:
+The core architecture is:
 
-**Virtual Pet + Local AI + Desktop World**
+**Desktop Companion + Useful Utilities + Local AI**
 
 Not a chatbot with a pet skin.
 
@@ -598,10 +635,8 @@ License to be determined as the project matures.
 <div align="center">
 
 **🐾 PIXXY**  
-*Desktop-first local AI companion*
+*Useful desktop companion • Local-first • AI-enhanced*
 
-Built around a simple idea:
-
-**The pet is the product. The AI makes the pet smarter and more alive.**
+**The pet is the personality. The utility makes Pixxy useful. The AI makes Pixxy smarter.**
 
 </div>
