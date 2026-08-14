@@ -65,8 +65,6 @@ export default function App() {
           window.pixxy.window.setSettingsOpen(true)
           window.pixxy.window.setMousePassthrough(false)
         } else {
-          // Keep the compact Pixxy window interactive so right-click and the
-          // deliberate double-click drag can always be received reliably.
           window.pixxy.window.setMousePassthrough(false)
         }
       })
@@ -194,11 +192,11 @@ export default function App() {
 
   if (!ready) return null
 
-  // IMPORTANT: pixxy_idle.png is a 6-column x 2-row sheet.
-  // Using 4x2 was the source of the extra half-character beside Pixxy.
+  // pixxy_idle.png is 1408x768: 4 columns x 2 rows = 352x384 cells.
+  // Using 6 columns creates fractional-width cells and slices adjacent poses.
   const animationFrameGrid = animation === 'wave'
     ? { columns: 8, rows: 1, fps: 3 }
-    : { columns: 6, rows: 2, fps: 1 }
+    : { columns: 4, rows: 2, fps: 1 }
 
   return (
     <main className={`pixxy-shell${dragging ? ' drag-enabled' : ''}`} aria-label="Pixxy desktop companion">
