@@ -22,6 +22,14 @@ const PET_WIDTH = 110
 const PET_HEIGHT = 150
 const DOUBLE_CLICK_WINDOW_MS = 320
 
+type PixxyWindowWithDrag = typeof window.pixxy.window & {
+  moveBy: (dx: number, dy: number) => void
+}
+
+function pixxyWindow() {
+  return window.pixxy.window as PixxyWindowWithDrag
+}
+
 export default function App() {
   const [settings, setSettings] = useState<PixxySettings>(initialSettings)
   const [ready, setReady] = useState(false)
@@ -50,7 +58,7 @@ export default function App() {
   useEffect(() => {
     function handleMouseMove(event: MouseEvent) {
       if (!draggingRef.current) return
-      window.pixxy.window.moveBy(event.movementX, event.movementY)
+      pixxyWindow().moveBy(event.movementX, event.movementY)
     }
 
     function handleMouseUp() {
