@@ -10,6 +10,7 @@ type SpriteAnimationProps = {
   height?: number
   freezeFrame?: number
   onComplete?: () => void
+  onFrame?: (frame: number, totalFrames: number) => void
 }
 
 type FrameBounds = {
@@ -56,14 +57,17 @@ export default function SpriteAnimation({
   rows,
   fps = 6,
   loop = true,
-  width = 240,
-  height = 300,
+  width = 110,
+  height = 150,
   freezeFrame,
   onComplete,
+  onFrame,
 }: SpriteAnimationProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const completionRef = useRef(onComplete)
+  const frameCallbackRef = useRef(onFrame)
   completionRef.current = onComplete
+  frameCallbackRef.current = onFrame
 
   useEffect(() => {
     let cancelled = false
@@ -91,8 +95,8 @@ export default function SpriteAnimation({
       frameCanvas.height = sourceHeight
       const frameContext = frameCanvas.getContext('2d', { willReadFrequently: true })
       if (!frameContext) return
-
       frameContext.imageSmoothingEnabled = false
+
       const totalFrames = columns * rows
       const frames: FrameBounds[] = []
 
@@ -121,8 +125,8 @@ export default function SpriteAnimation({
       const maxFrameWidth = Math.max(...frames.map((frame) => frame.width))
       const maxFrameHeight = Math.max(...frames.map((frame) => frame.height))
       const targetScale = Math.min(
-        (canvas.width * 0.94) / maxFrameWidth,
-        (canvas.height * 0.97) / maxFrameHeight,
+        (canvas.width - 4) / maxFrameWidth,
+        (canvas.height - 4) / maxFrameHeight,
       )
       const baseline = Math.max(...frames.map((frame) => frame.bottom))
       const frameDelay = Math.max(60, 1000 / fps)
@@ -145,7 +149,10 @@ export default function SpriteAnimation({
           sourceHeight,
         )
 
+        // Clear and replace the entire displayed frame. Nothing from the previous
+        // sprite frame is allowed to remain behind the new frame.
         context.clearRect(0, 0, canvas.width, canvas.height)
+
         const destinationWidth = bounds.width * targetScale
         const destinationHeight = bounds.height * targetScale
         const destinationX = (canvas.width - destinationWidth) / 2
@@ -162,6 +169,8 @@ export default function SpriteAnimation({
           Math.round(destinationWidth),
           Math.round(destinationHeight),
         )
+
+        frameCallbackRef.current?.(frame, totalFrames)
 
         if (freezeFrame !== undefined) return
 
