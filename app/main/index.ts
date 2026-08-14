@@ -177,6 +177,17 @@ app.whenReady().then(() => {
     setMousePassthrough(passthrough)
   })
 
+  ipcMain.on('window:move-by', (_event, dx: number, dy: number) => {
+    if (!mainWindow || !Number.isFinite(dx) || !Number.isFinite(dy)) return
+
+    const bounds = mainWindow.getBounds()
+    const area = workArea()
+    const x = Math.min(Math.max(bounds.x + Math.round(dx), area.x), area.x + area.width - bounds.width)
+    const y = Math.min(Math.max(bounds.y + Math.round(dy), area.y), area.y + area.height - bounds.height)
+
+    mainWindow.setPosition(x, y)
+  })
+
   createWindow()
   createTray()
 
