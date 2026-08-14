@@ -21,33 +21,117 @@ type FrameBounds = {
   bottom: number
 }
 
-function findFrameBounds(context: CanvasRenderingContext2D, width: number, height: number): FrameBounds | null {
+type Component = {
+  x: number
+  y: number
+  width: number
+  height: number
+  area: number
+}
+
+function findComponents(context: CanvasRenderingContext2D, width: number, height: number): Component[] {
   const pixels = context.getImageData(0, 0, width, height).data
-  let minX = width
-  let minY = height
-  let maxX = -1
-  let maxY = -1
+  const visited = new Uint8Array(width * height)
+  const queue = new Int32Array(width * height)
+  const components: Component[] = []
+
+  const alphaAt = (x: number, y: number) => pixels[(y * width + x) * 4 + 3] > 8
 
   for (let y = 0; y < height; y += 1) {
     for (let x = 0; x < width; x += 1) {
-      const alpha = pixels[(y * width + x) * 4 + 3]
-      if (alpha > 8) {
-        if (x < minX) minX = x
-        if (y < minY) minY = y
-        if (x > maxX) maxX = x
-        if (y > maxY) maxY = y
+      const index = y * width + x
+      if (visited[index] || !alphaAt(x, y)) continue
+
+      let head = 0
+      let tail = 0
+      queue[tail] = index
+      tail += 1
+      visited[index] = 1
+
+      let minX = x
+      let minY = y
+      let maxX = x
+      let maxY = y
+      let area = 0
+
+      while (head < tail) {
+        const currentIndex = queue[head]
+        const currentX = currentIndex % width
+        const currentY = Math.floor(currentIndex / width)
+        head += 1
+        area += 1
+
+        if (currentX < minX) minX = currentX
+        if (currentY < minY) minY = currentY
+        if (currentX > maxX) maxX = currentX
+        if (currentY > maxY) maxY = currentY
+
+        const neighbors = [
+          [currentX - 1, currentY],
+          [currentX + 1, currentY],
+          [currentX, currentY - 1],
+          [currentX, currentY + 1],
+        ]
+
+        for (const [nextX, nextY] of neighbors) {
+          if (nextX < 0 || nextX >= width || nextY < 0 || nextY >= height) continue
+          const nextIndex = nextY * width + nextX
+          if (visited[nextIndex] || !alphaAt(nextX, nextY)) continue
+
+          visited[nextIndex] = 1
+          queue[tail] = nextIndex
+          tail += 1
+        }
       }
+
+      components.push({
+        x: minX,
+        y: minY,
+        width: maxX - minX + 1,
+        height: maxY - minY + 1,
+        area,
+      })
     }
   }
 
-  if (maxX < 0 || maxY < 0) return null
+  return components.sort((a, b) => b.area - a.area)
+}
+
+function findFrameBounds(context: CanvasRenderingContext2D, width: number, height: number): FrameBounds | null {
+  const components = findComponents(context, width, height)
+  const main = components[0]
+  if (!main) return null
+
+  // The old bounds calculation treated every non-transparent pixel in a frame
+  // as one sprite. If the source sheet has a neighbouring pose touching a cell,
+  // that pulls the neighbour into Pixxy and creates the visible half-character.
+  // Start from the largest component and only keep nearby disconnected details.
+  const padding = 18
+  const left = main.x - padding
+  const top = main.y - padding
+  const right = main.x + main.width + padding
+  const bottom = main.y + main.height + padding
+
+  const selected = components.filter((component) => {
+    const componentRight = component.x + component.width
+    const componentBottom = component.y + component.height
+    return component.x <= right
+      && componentRight >= left
+      && component.y <= bottom
+      && componentBottom >= top
+  })
+
+  const minX = Math.min(...selected.map((component) => component.x))
+  const minY = Math.min(...selected.map((component) => component.y))
+  const maxX = Math.max(...selected.map((component) => component.x + component.width))
+  const maxY = Math.max(...selected.map((component) => component.y + component.height))
 
   return {
     x: minX,
     y: minY,
-    width: maxX - minX + 1,
-    height: maxY - minY + 1,
-    bottom: maxY + 1,
+    width: maxX - minX,
+    height: maxY - minY,
+    bottom: maxY,
   }
 }
 
