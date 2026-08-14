@@ -7,8 +7,10 @@ let tray: Tray | null = null
 let isQuitting = false
 
 const PROFILE_VERSION = 3
-const PET_WINDOW_WIDTH = 150
-const PET_WINDOW_HEIGHT = 175
+// Keep the native window close to the actual Pixxy body. This window is the
+// moving hitbox; the sprite is no longer travelling inside a large stage.
+const PET_WINDOW_WIDTH = 110
+const PET_WINDOW_HEIGHT = 150
 const SETTINGS_WINDOW_WIDTH = 340
 const SETTINGS_WINDOW_HEIGHT = 430
 
@@ -183,6 +185,8 @@ app.whenReady().then(() => {
     const hitBoundary = nextX === bounds.x && delta !== 0
     if (nextX !== bounds.x) {
       const area = workArea()
+      // Move the native window itself. The sprite frame is replaced in place;
+      // there is no horizontal translation of a sprite inside a fixed stage.
       mainWindow.setPosition(nextX, area.y + area.height - bounds.height, true)
     }
 
