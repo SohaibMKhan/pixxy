@@ -56,28 +56,6 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    function handleMouseMove(event: MouseEvent) {
-      if (!draggingRef.current) return
-      pixxyWindow().moveBy(event.movementX, event.movementY)
-    }
-
-    function handleMouseUp() {
-      if (!draggingRef.current) return
-      draggingRef.current = false
-      setDragging(false)
-      window.pixxy.window.setMousePassthrough(true)
-    }
-
-    window.addEventListener('mousemove', handleMouseMove)
-    window.addEventListener('mouseup', handleMouseUp)
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('mouseup', handleMouseUp)
-    }
-  }, [])
-
-  useEffect(() => {
     void window.pixxy.settings.read()
       .then((saved) => {
         setSettings(saved)
@@ -87,7 +65,9 @@ export default function App() {
           window.pixxy.window.setSettingsOpen(true)
           window.pixxy.window.setMousePassthrough(false)
         } else {
-          window.pixxy.window.setMousePassthrough(true)
+          // Keep the compact Pixxy window interactive so right-click and the
+          // deliberate double-click drag can always be received reliably.
+          window.pixxy.window.setMousePassthrough(false)
         }
       })
       .catch(() => {
@@ -129,7 +109,7 @@ export default function App() {
     setSettings(saved)
     setPanel(null)
     window.pixxy.window.setSettingsOpen(false)
-    window.pixxy.window.setMousePassthrough(true)
+    window.pixxy.window.setMousePassthrough(false)
     setAnimation('wave')
   }
 
@@ -153,35 +133,53 @@ export default function App() {
     setSettings(saved)
   }
 
-  function handlePetMouseDown(event: React.MouseEvent<HTMLButtonElement>) {
+  function startDrag(event: React.PointerEvent<HTMLButtonElement>) {
     if (event.button !== 0 || panelRef.current !== null) return
 
     const now = Date.now()
     const isDoubleClick = now - lastMouseDownAt.current <= DOUBLE_CLICK_WINDOW_MS
     lastMouseDownAt.current = now
 
-    if (isDoubleClick) {
-      if (clickTimer.current !== undefined) {
-        window.clearTimeout(clickTimer.current)
+    if (!isDoubleClick) {
+      if (clickTimer.current !== undefined) window.clearTimeout(clickTimer.current)
+      clickTimer.current = window.setTimeout(() => {
+        setAnimation('wave')
         clickTimer.current = undefined
-      }
-
-      draggingRef.current = true
-      setDragging(true)
-      window.pixxy.window.setMousePassthrough(false)
-      event.preventDefault()
+      }, 180)
       return
     }
 
-    if (clickTimer.current !== undefined) window.clearTimeout(clickTimer.current)
-    clickTimer.current = window.setTimeout(() => {
-      setAnimation('wave')
+    if (clickTimer.current !== undefined) {
+      window.clearTimeout(clickTimer.current)
       clickTimer.current = undefined
-    }, 180)
+    }
+
+    draggingRef.current = true
+    setDragging(true)
+    window.pixxy.window.setMousePassthrough(false)
+    event.currentTarget.setPointerCapture(event.pointerId)
+    event.preventDefault()
+  }
+
+  function moveDrag(event: React.PointerEvent<HTMLButtonElement>) {
+    if (!draggingRef.current) return
+    const dx = event.movementX
+    const dy = event.movementY
+    if (dx !== 0 || dy !== 0) pixxyWindow().moveBy(dx, dy)
+  }
+
+  function finishDrag(event: React.PointerEvent<HTMLButtonElement>) {
+    if (!draggingRef.current) return
+    draggingRef.current = false
+    setDragging(false)
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
   }
 
   function handlePetContextMenu(event: React.MouseEvent<HTMLButtonElement>) {
     event.preventDefault()
+    if (draggingRef.current) return
     setPanel('settings')
     window.pixxy.window.setSettingsOpen(true)
     window.pixxy.window.setMousePassthrough(false)
@@ -190,27 +188,17 @@ export default function App() {
   function closeSettings() {
     setPanel(null)
     window.pixxy.window.setSettingsOpen(false)
-    window.pixxy.window.setMousePassthrough(true)
+    window.pixxy.window.setMousePassthrough(false)
     setAnimation('idle')
-  }
-
-  function handlePetMouseEnter() {
-    if (panelRef.current === null && !draggingRef.current) {
-      window.pixxy.window.setMousePassthrough(false)
-    }
-  }
-
-  function handlePetMouseLeave() {
-    if (panelRef.current === null && !draggingRef.current) {
-      window.pixxy.window.setMousePassthrough(true)
-    }
   }
 
   if (!ready) return null
 
+  // IMPORTANT: pixxy_idle.png is a 6-column x 2-row sheet.
+  // Using 4x2 was the source of the extra half-character beside Pixxy.
   const animationFrameGrid = animation === 'wave'
     ? { columns: 8, rows: 1, fps: 3 }
-    : { columns: 4, rows: 2, fps: 1 }
+    : { columns: 6, rows: 2, fps: 1 }
 
   return (
     <main className={`pixxy-shell${dragging ? ' drag-enabled' : ''}`} aria-label="Pixxy desktop companion">
@@ -218,9 +206,10 @@ export default function App() {
         className="pet"
         type="button"
         aria-label="Pixxy"
-        onMouseEnter={handlePetMouseEnter}
-        onMouseLeave={handlePetMouseLeave}
-        onMouseDown={handlePetMouseDown}
+        onPointerDown={startDrag}
+        onPointerMove={moveDrag}
+        onPointerUp={finishDrag}
+        onPointerCancel={finishDrag}
         onContextMenu={handlePetContextMenu}
       >
         <SpriteAnimation
