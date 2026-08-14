@@ -19,6 +19,7 @@ declare global {
       window: {
         setSettingsOpen: (open: boolean) => void
         setMousePassthrough: (passthrough: boolean) => void
+        moveBy: (dx: number, dy: number) => void
       }
     }
   }
