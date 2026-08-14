@@ -22,9 +22,11 @@ const animationSources: Record<AnimationName, string> = {
   wave: waveSheet,
 }
 
-const PET_STEP = 2.4
-const PET_WIDTH = 150
-const PET_HEIGHT = 175
+// The native window is intentionally close to Pixxy's visible bounds. The window
+// itself is the moving hitbox; the sprite is never translated inside a large stage.
+const PET_WIDTH = 110
+const PET_HEIGHT = 150
+const WALK_STEP = 5.2
 
 export default function App() {
   const [settings, setSettings] = useState<PixxySettings>(initialSettings)
@@ -68,24 +70,6 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    if (!ready || animation !== 'walk') return
-
-    const timer = window.setInterval(() => {
-      if (movePendingRef.current || panelRef.current !== null) return
-      movePendingRef.current = true
-      void window.pixxy.window.moveBy(direction * PET_STEP)
-        .then((result) => {
-          if (result.hitBoundary) setDirection((value) => (value === 1 ? -1 : 1))
-        })
-        .finally(() => {
-          movePendingRef.current = false
-        })
-    }, 55)
-
-    return () => window.clearInterval(timer)
-  }, [animation, direction, ready])
-
-  useEffect(() => {
     if (!ready || !settings.completedOnboarding) return
 
     let cancelled = false
@@ -98,12 +82,13 @@ export default function App() {
       await waitForSettingsToClose()
       if (cancelled) return
 
+      // Launch: one readable wave, then a completely stationary idle pose.
       setAnimation('wave')
-      await wait(4200)
+      await wait(3000)
       if (cancelled) return
 
       setAnimation('idle')
-      await wait(9000)
+      await wait(8500)
 
       while (!cancelled) {
         await waitForSettingsToClose()
@@ -111,11 +96,13 @@ export default function App() {
 
         setDirection(Math.random() > 0.5 ? 1 : -1)
         setAnimation('walk')
-        await wait(6500 + Math.round(Math.random() * 3000))
+        await wait(7600 + Math.round(Math.random() * 1800))
         if (cancelled) break
 
+        // Walking ends in a fixed frame. There is deliberately no idle sliding,
+        // bounce, celebration or other autonomous animation in this pass.
         setAnimation('idle')
-        await wait(6500 + Math.round(Math.random() * 3500))
+        await wait(6500 + Math.round(Math.random() * 3000))
       }
     }
 
@@ -201,6 +188,19 @@ export default function App() {
     if (panelRef.current === null && !dragEnabled) window.pixxy.window.setMousePassthrough(true)
   }
 
+  function handleWalkFrame() {
+    if (animation !== 'walk' || panelRef.current !== null || movePendingRef.current) return
+
+    movePendingRef.current = true
+    void window.pixxy.window.moveBy(direction * WALK_STEP)
+      .then((result) => {
+        if (result.hitBoundary) setDirection((value) => (value === 1 ? -1 : 1))
+      })
+      .finally(() => {
+        movePendingRef.current = false
+      })
+  }
+
   if (!ready) return null
 
   const animationFrameGrid = animation === 'walk'
@@ -213,7 +213,7 @@ export default function App() {
     <main className={`pixxy-shell theme-${settings.roomTheme} ${dragEnabled ? 'drag-enabled' : ''}`} aria-label="Pixxy desktop companion">
       <button
         className="pet"
-        style={{ transform: `scaleX(${direction})` }}
+        style={{ transform: animation === 'walk' ? `scaleX(${direction})` : undefined }}
         type="button"
         aria-label="Pixxy"
         onMouseEnter={handlePetMouseEnter}
@@ -230,6 +230,7 @@ export default function App() {
           freezeFrame={animation === 'idle' ? 0 : undefined}
           width={PET_WIDTH}
           height={PET_HEIGHT}
+          onFrame={animation === 'walk' ? handleWalkFrame : undefined}
           onComplete={() => setAnimation('idle')}
         />
       </button>
