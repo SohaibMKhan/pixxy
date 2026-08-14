@@ -6,14 +6,14 @@ let mainWindow: BrowserWindow | null = null
 let tray: Tray | null = null
 let isQuitting = false
 
-const PROFILE_VERSION = 2
-const PET_WINDOW_WIDTH = 190
-const PET_WINDOW_HEIGHT = 205
+const PROFILE_VERSION = 3
+const PET_WINDOW_WIDTH = 150
+const PET_WINDOW_HEIGHT = 175
 const SETTINGS_WINDOW_WIDTH = 340
 const SETTINGS_WINDOW_HEIGHT = 430
 
 const pixxyIcon = nativeImage.createFromDataURL(
-  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI4IiBmaWxsPSIjMjY1ZjczIi8+PGNpcmNsZSBjeD0iMTEiIGN5PSIxMyIgcj0iMyIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjIxIiBjeT0iMTMiIHI9IjMiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNOSAyMGM0IDMgMTAgMyAxNCAwIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+',
+  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDMyIDMyIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI4IiBmaWxsPSIjMjY1ZjczIi8+PGNpcmNsZSBjeD0iMTEiIGN5PSIxMyIgcj0iMyIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjIxIiBjeT0iMTMiIHI9IjMiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNOSAyMGM0IDMgMTAgMyAxNCAwIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0PSIzIiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48L3N2Zz4=',
 )
 
 export type PixxySettings = {
@@ -75,6 +75,11 @@ function applySettings(settings: PixxySettings) {
   app.setLoginItemSettings({ openAtLogin: settings.launchAtLogin })
 }
 
+function setMousePassthrough(passthrough: boolean) {
+  if (!mainWindow) return
+  mainWindow.setIgnoreMouseEvents(passthrough, { forward: true })
+}
+
 function setWindowMode(mode: 'pet' | 'settings') {
   if (!mainWindow) return
 
@@ -86,6 +91,7 @@ function setWindowMode(mode: 'pet' | 'settings') {
   const y = area.y + area.height - height
 
   mainWindow.setBounds({ x, y, width, height }, true)
+  setMousePassthrough(mode === 'pet')
 }
 
 function createTray() {
@@ -131,6 +137,8 @@ function createWindow() {
     },
   })
 
+  mainWindow.setSkipTaskbar(false)
+
   if (process.env.ELECTRON_RENDERER_URL) {
     void mainWindow.loadURL(process.env.ELECTRON_RENDERER_URL)
   } else {
@@ -156,6 +164,15 @@ app.whenReady().then(() => {
 
   ipcMain.on('window:set-settings-open', (_event, open: boolean) => {
     setWindowMode(open ? 'settings' : 'pet')
+  })
+
+  ipcMain.on('window:set-mouse-passthrough', (_event, passthrough: boolean) => {
+    if (!mainWindow) return
+    if (mainWindow.getBounds().width === SETTINGS_WINDOW_WIDTH) {
+      setMousePassthrough(false)
+      return
+    }
+    setMousePassthrough(passthrough)
   })
 
   ipcMain.handle('window:move-by', (_event, delta: number) => {

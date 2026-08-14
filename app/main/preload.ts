@@ -8,6 +8,7 @@ contextBridge.exposeInMainWorld('pixxy', {
   },
   window: {
     setSettingsOpen: (open: boolean) => ipcRenderer.send('window:set-settings-open', open),
+    setMousePassthrough: (passthrough: boolean) => ipcRenderer.send('window:set-mouse-passthrough', passthrough),
     moveBy: (delta: number) => ipcRenderer.invoke('window:move-by', delta) as Promise<{ x: number; hitBoundary: boolean }>,
   },
 })

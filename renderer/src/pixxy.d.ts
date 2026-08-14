@@ -20,6 +20,7 @@ declare global {
       }
       window: {
         setSettingsOpen: (open: boolean) => void
+        setMousePassthrough: (passthrough: boolean) => void
         moveBy: (delta: number) => Promise<{ x: number; hitBoundary: boolean }>
       }
     }

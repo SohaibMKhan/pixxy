@@ -17,6 +17,7 @@ button { cursor: pointer; }
   height: 100%;
   overflow: visible;
   -webkit-app-region: no-drag;
+  user-select: none;
 }
 
 .pixxy-shell.drag-enabled,
@@ -28,8 +29,8 @@ button { cursor: pointer; }
   position: absolute;
   left: 0;
   bottom: 0;
-  width: 190px;
-  height: 205px;
+  width: 150px;
+  height: 175px;
   padding: 0;
   margin: 0;
   border: 0;
@@ -39,6 +40,14 @@ button { cursor: pointer; }
   -webkit-app-region: no-drag;
   transform-origin: center bottom;
   transition: filter .12s ease;
+}
+
+.pixxy-shell.drag-enabled .pet {
+  cursor: grab;
+}
+
+.pixxy-shell.drag-enabled .pet:active {
+  cursor: grabbing;
 }
 
 .pet:hover { filter: brightness(1.04); }

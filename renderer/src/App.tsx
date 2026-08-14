@@ -5,7 +5,7 @@ import waveSheet from './assets/animations/wave/pixxy_wave.png'
 import walkSheet from './assets/animations/walk/pixxy_walk_8f.png'
 
 const initialSettings: PixxySettings = {
-  profileVersion: 2,
+  profileVersion: 3,
   completedOnboarding: false,
   displayName: '',
   roomTheme: 'meadow',
@@ -22,7 +22,9 @@ const animationSources: Record<AnimationName, string> = {
   wave: waveSheet,
 }
 
-const PET_STEP = 2.2
+const PET_STEP = 2.4
+const PET_WIDTH = 150
+const PET_HEIGHT = 175
 
 export default function App() {
   const [settings, setSettings] = useState<PixxySettings>(initialSettings)
@@ -52,11 +54,15 @@ export default function App() {
         if (!saved.completedOnboarding || !saved.displayName.trim()) {
           setPanel('onboarding')
           window.pixxy.window.setSettingsOpen(true)
+          window.pixxy.window.setMousePassthrough(false)
+        } else {
+          window.pixxy.window.setMousePassthrough(true)
         }
       })
       .catch(() => {
         setPanel('onboarding')
         window.pixxy.window.setSettingsOpen(true)
+        window.pixxy.window.setMousePassthrough(false)
       })
       .finally(() => setReady(true))
   }, [])
@@ -74,7 +80,7 @@ export default function App() {
         .finally(() => {
           movePendingRef.current = false
         })
-    }, 45)
+    }, 55)
 
     return () => window.clearInterval(timer)
   }, [animation, direction, ready])
@@ -93,11 +99,11 @@ export default function App() {
       if (cancelled) return
 
       setAnimation('wave')
-      await wait(3000)
+      await wait(4200)
       if (cancelled) return
 
       setAnimation('idle')
-      await wait(7500)
+      await wait(9000)
 
       while (!cancelled) {
         await waitForSettingsToClose()
@@ -105,11 +111,11 @@ export default function App() {
 
         setDirection(Math.random() > 0.5 ? 1 : -1)
         setAnimation('walk')
-        await wait(6500 + Math.round(Math.random() * 2500))
+        await wait(6500 + Math.round(Math.random() * 3000))
         if (cancelled) break
 
         setAnimation('idle')
-        await wait(5500 + Math.round(Math.random() * 3000))
+        await wait(6500 + Math.round(Math.random() * 3500))
       }
     }
 
@@ -133,6 +139,7 @@ export default function App() {
     setPanel(null)
     setDragEnabled(false)
     window.pixxy.window.setSettingsOpen(false)
+    window.pixxy.window.setMousePassthrough(true)
     setAnimation('wave')
   }
 
@@ -146,6 +153,7 @@ export default function App() {
     setDragEnabled(false)
     setPanel('onboarding')
     window.pixxy.window.setSettingsOpen(true)
+    window.pixxy.window.setMousePassthrough(false)
   }
 
   async function restoreDefaults() {
@@ -163,7 +171,7 @@ export default function App() {
     clickTimer.current = window.setTimeout(() => {
       setAnimation('wave')
       clickTimer.current = undefined
-    }, 220)
+    }, 180)
   }
 
   function handlePetDoubleClick() {
@@ -174,23 +182,31 @@ export default function App() {
     setDragEnabled(true)
     setPanel('settings')
     window.pixxy.window.setSettingsOpen(true)
+    window.pixxy.window.setMousePassthrough(false)
   }
 
   function closeSettings() {
     setPanel(null)
     setDragEnabled(false)
     window.pixxy.window.setSettingsOpen(false)
+    window.pixxy.window.setMousePassthrough(true)
     setAnimation('idle')
+  }
+
+  function handlePetMouseEnter() {
+    if (panelRef.current === null && !dragEnabled) window.pixxy.window.setMousePassthrough(false)
+  }
+
+  function handlePetMouseLeave() {
+    if (panelRef.current === null && !dragEnabled) window.pixxy.window.setMousePassthrough(true)
   }
 
   if (!ready) return null
 
-  // The supplied idle/walk sheets are 1376×768 with 8 frames arranged 4×2.
-  // The supplied wave sheet is 8 frames arranged 8×1.
   const animationFrameGrid = animation === 'walk'
     ? { columns: 4, rows: 2, fps: 7 }
     : animation === 'wave'
-      ? { columns: 8, rows: 1, fps: 4 }
+      ? { columns: 8, rows: 1, fps: 3 }
       : { columns: 4, rows: 2, fps: 1 }
 
   return (
@@ -200,6 +216,8 @@ export default function App() {
         style={{ transform: `scaleX(${direction})` }}
         type="button"
         aria-label="Pixxy"
+        onMouseEnter={handlePetMouseEnter}
+        onMouseLeave={handlePetMouseLeave}
         onClick={handlePetClick}
         onDoubleClick={handlePetDoubleClick}
       >
@@ -210,8 +228,8 @@ export default function App() {
           fps={animationFrameGrid.fps}
           loop={animation !== 'idle'}
           freezeFrame={animation === 'idle' ? 0 : undefined}
-          width={190}
-          height={205}
+          width={PET_WIDTH}
+          height={PET_HEIGHT}
           onComplete={() => setAnimation('idle')}
         />
       </button>
