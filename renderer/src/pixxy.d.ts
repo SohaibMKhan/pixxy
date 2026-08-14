@@ -5,9 +5,7 @@ declare global {
     profileVersion: number
     completedOnboarding: boolean
     displayName: string
-    roomTheme: 'meadow' | 'moonlight' | 'sunset' | 'ocean' | 'lavender' | 'peach'
     alwaysOnTop: boolean
-    desktopAwarenessEnabled: boolean
     launchAtLogin: boolean
   }
 
@@ -21,7 +19,6 @@ declare global {
       window: {
         setSettingsOpen: (open: boolean) => void
         setMousePassthrough: (passthrough: boolean) => void
-        moveBy: (delta: number) => Promise<{ x: number; hitBoundary: boolean }>
       }
     }
   }
