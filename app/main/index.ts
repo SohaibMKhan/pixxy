@@ -6,9 +6,7 @@ let mainWindow: BrowserWindow | null = null
 let tray: Tray | null = null
 let isQuitting = false
 
-const PROFILE_VERSION = 3
-// Keep the native window close to the actual Pixxy body. This window is the
-// moving hitbox; the sprite is no longer travelling inside a large stage.
+const PROFILE_VERSION = 4
 const PET_WINDOW_WIDTH = 110
 const PET_WINDOW_HEIGHT = 150
 const SETTINGS_WINDOW_WIDTH = 340
@@ -22,9 +20,7 @@ export type PixxySettings = {
   profileVersion: number
   completedOnboarding: boolean
   displayName: string
-  roomTheme: 'meadow' | 'moonlight' | 'sunset' | 'ocean' | 'lavender' | 'peach'
   alwaysOnTop: boolean
-  desktopAwarenessEnabled: boolean
   launchAtLogin: boolean
 }
 
@@ -32,9 +28,7 @@ const defaultSettings: PixxySettings = {
   profileVersion: PROFILE_VERSION,
   completedOnboarding: false,
   displayName: '',
-  roomTheme: 'meadow',
   alwaysOnTop: false,
-  desktopAwarenessEnabled: false,
   launchAtLogin: false,
 }
 
@@ -56,11 +50,10 @@ function readSettings(): PixxySettings {
     const saved = JSON.parse(fs.readFileSync(settingsPath(), 'utf8'))
     if (saved.profileVersion !== PROFILE_VERSION) return defaultSettings
 
-    const validThemes: PixxySettings['roomTheme'][] = ['meadow', 'moonlight', 'sunset', 'ocean', 'lavender', 'peach']
     return {
       ...defaultSettings,
       ...saved,
-      roomTheme: validThemes.includes(saved.roomTheme) ? saved.roomTheme : defaultSettings.roomTheme,
+      profileVersion: PROFILE_VERSION,
     }
   } catch {
     return defaultSettings
@@ -116,6 +109,7 @@ function createWindow() {
   const height = PET_WINDOW_HEIGHT
   const x = clampWindowX(area.x + 80, width)
   const y = area.y + area.height - height
+  const settings = readSettings()
 
   mainWindow = new BrowserWindow({
     width,
@@ -128,7 +122,7 @@ function createWindow() {
     frame: false,
     resizable: false,
     focusable: true,
-    alwaysOnTop: readSettings().alwaysOnTop,
+    alwaysOnTop: settings.alwaysOnTop,
     skipTaskbar: false,
     icon: pixxyIcon,
     autoHideMenuBar: true,
@@ -140,6 +134,7 @@ function createWindow() {
   })
 
   mainWindow.setSkipTaskbar(false)
+  applySettings(settings)
 
   if (process.env.ELECTRON_RENDERER_URL) {
     void mainWindow.loadURL(process.env.ELECTRON_RENDERER_URL)
@@ -158,7 +153,12 @@ function createWindow() {
 app.whenReady().then(() => {
   ipcMain.handle('settings:read', () => readSettings())
   ipcMain.handle('settings:update', (_event, update: Partial<PixxySettings>) => {
-    const settings = { ...readSettings(), ...update, profileVersion: PROFILE_VERSION }
+    const current = readSettings()
+    const settings: PixxySettings = {
+      ...current,
+      ...update,
+      profileVersion: PROFILE_VERSION,
+    }
     writeSettings(settings)
     applySettings(settings)
     return settings
@@ -175,22 +175,6 @@ app.whenReady().then(() => {
       return
     }
     setMousePassthrough(passthrough)
-  })
-
-  ipcMain.handle('window:move-by', (_event, delta: number) => {
-    if (!mainWindow) return { x: 0, hitBoundary: false }
-
-    const bounds = mainWindow.getBounds()
-    const nextX = clampWindowX(bounds.x + delta, bounds.width)
-    const hitBoundary = nextX === bounds.x && delta !== 0
-    if (nextX !== bounds.x) {
-      const area = workArea()
-      // Move the native window itself. The sprite frame is replaced in place;
-      // there is no horizontal translation of a sprite inside a fixed stage.
-      mainWindow.setPosition(nextX, area.y + area.height - bounds.height, true)
-    }
-
-    return { x: nextX, hitBoundary }
   })
 
   createWindow()
