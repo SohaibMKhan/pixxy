@@ -20,11 +20,6 @@ button { cursor: pointer; }
   user-select: none;
 }
 
-.pixxy-shell.drag-enabled,
-.pixxy-shell.drag-enabled .pet {
-  -webkit-app-region: drag;
-}
-
 .pet {
   position: absolute;
   left: 0;
@@ -43,10 +38,6 @@ button { cursor: pointer; }
 }
 
 .pixxy-shell.drag-enabled .pet {
-  cursor: grab;
-}
-
-.pixxy-shell.drag-enabled .pet:active {
   cursor: grabbing;
 }
 
