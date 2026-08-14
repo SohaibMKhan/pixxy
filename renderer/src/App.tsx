@@ -20,6 +20,7 @@ const animationSources: Record<AnimationName, string> = {
 
 const PET_WIDTH = 110
 const PET_HEIGHT = 150
+const DOUBLE_CLICK_WINDOW_MS = 320
 
 export default function App() {
   const [settings, setSettings] = useState<PixxySettings>(initialSettings)
@@ -27,15 +28,45 @@ export default function App() {
   const [panel, setPanel] = useState<'settings' | 'onboarding' | null>(null)
   const [name, setName] = useState('')
   const [animation, setAnimation] = useState<AnimationName>('idle')
+  const [dragging, setDragging] = useState(false)
+
   const clickTimer = useRef<number | undefined>(undefined)
+  const lastMouseDownAt = useRef(0)
+  const draggingRef = useRef(false)
   const panelRef = useRef<typeof panel>(null)
 
   useEffect(() => {
     panelRef.current = panel
   }, [panel])
 
+  useEffect(() => {
+    draggingRef.current = dragging
+  }, [dragging])
+
   useEffect(() => () => {
     if (clickTimer.current !== undefined) window.clearTimeout(clickTimer.current)
+  }, [])
+
+  useEffect(() => {
+    function handleMouseMove(event: MouseEvent) {
+      if (!draggingRef.current) return
+      window.pixxy.window.moveBy(event.movementX, event.movementY)
+    }
+
+    function handleMouseUp() {
+      if (!draggingRef.current) return
+      draggingRef.current = false
+      setDragging(false)
+      window.pixxy.window.setMousePassthrough(true)
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+    }
   }, [])
 
   useEffect(() => {
@@ -114,7 +145,26 @@ export default function App() {
     setSettings(saved)
   }
 
-  function handlePetClick() {
+  function handlePetMouseDown(event: React.MouseEvent<HTMLButtonElement>) {
+    if (event.button !== 0 || panelRef.current !== null) return
+
+    const now = Date.now()
+    const isDoubleClick = now - lastMouseDownAt.current <= DOUBLE_CLICK_WINDOW_MS
+    lastMouseDownAt.current = now
+
+    if (isDoubleClick) {
+      if (clickTimer.current !== undefined) {
+        window.clearTimeout(clickTimer.current)
+        clickTimer.current = undefined
+      }
+
+      draggingRef.current = true
+      setDragging(true)
+      window.pixxy.window.setMousePassthrough(false)
+      event.preventDefault()
+      return
+    }
+
     if (clickTimer.current !== undefined) window.clearTimeout(clickTimer.current)
     clickTimer.current = window.setTimeout(() => {
       setAnimation('wave')
@@ -137,11 +187,15 @@ export default function App() {
   }
 
   function handlePetMouseEnter() {
-    if (panelRef.current === null) window.pixxy.window.setMousePassthrough(false)
+    if (panelRef.current === null && !draggingRef.current) {
+      window.pixxy.window.setMousePassthrough(false)
+    }
   }
 
   function handlePetMouseLeave() {
-    if (panelRef.current === null) window.pixxy.window.setMousePassthrough(true)
+    if (panelRef.current === null && !draggingRef.current) {
+      window.pixxy.window.setMousePassthrough(true)
+    }
   }
 
   if (!ready) return null
@@ -151,14 +205,14 @@ export default function App() {
     : { columns: 4, rows: 2, fps: 1 }
 
   return (
-    <main className="pixxy-shell" aria-label="Pixxy desktop companion">
+    <main className={`pixxy-shell${dragging ? ' drag-enabled' : ''}`} aria-label="Pixxy desktop companion">
       <button
         className="pet"
         type="button"
         aria-label="Pixxy"
         onMouseEnter={handlePetMouseEnter}
         onMouseLeave={handlePetMouseLeave}
-        onClick={handlePetClick}
+        onMouseDown={handlePetMouseDown}
         onContextMenu={handlePetContextMenu}
       >
         <SpriteAnimation
