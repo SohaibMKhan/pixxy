@@ -192,11 +192,14 @@ export default function App() {
 
   if (!ready) return null
 
-  // pixxy_idle.png is 1408x768: 4 columns x 2 rows = 352x384 cells.
-  // Using 6 columns creates fractional-width cells and slices adjacent poses.
+  // The current idle asset is a single horizontal sheet. Its first cell is the
+  // canonical complete standing Pixxy. The remaining cells contain animation
+  // poses with neighboring/partial artwork, so idle deliberately freezes frame 0.
+  // This guarantees that idle always renders exactly one complete character and
+  // can never expose a half-character from an adjacent sheet cell.
   const animationFrameGrid = animation === 'wave'
     ? { columns: 8, rows: 1, fps: 3 }
-    : { columns: 4, rows: 2, fps: 1 }
+    : { columns: 12, rows: 1, fps: 1 }
 
   return (
     <main className={`pixxy-shell${dragging ? ' drag-enabled' : ''}`} aria-label="Pixxy desktop companion">
